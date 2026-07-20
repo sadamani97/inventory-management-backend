@@ -47,8 +47,12 @@ export const loginService = async (data) => {
             message: "Invalid email or password",
         };
     }
+    console.log("Entered Password:", password);
+    console.log("User:", user);
+    console.log("Stored Password:", user?.password);
     // 2. Compare password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const hashedPassword = user.getDataValue("password");
+    const isPasswordValid = await bcrypt.compare(password, hashedPassword);
     if (!isPasswordValid) {
         return {
             success: false,
@@ -63,8 +67,6 @@ export const loginService = async (data) => {
         token,
         data: {
             id: user.id,
-            firstname: user.firstname,
-            lastname: user.lastname,
             email: user.email,
         },
     };

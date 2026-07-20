@@ -1,15 +1,31 @@
 import { Product } from "../models/product.model.js";
+import { Category } from "../models/categories.model.js";
 
 
 class ProductService {
     async create(data:any){
-    return await Product.create(data)
+        return await Product.create(data)
     }
     async findAll() {
-        return await Product.findAll()
+        return await Product.findAll({
+            include: [
+                {
+                    model: Category,
+                    as:"category",
+                    attributes: ["categoryId", "categoryName"],
+                },  
+            ],
+        })
     }
     async FindById(id:number){
-        const product = await Product.findByPk(id)
+        const product = await Product.findByPk(id,{include: [
+                {
+                    model: Category,
+                    as:"category",
+                    attributes: ["categoryId", "categoryName"],
+                },  
+            ],
+        })
         if(!product) {
             throw new Error("Product Not Found");
         }

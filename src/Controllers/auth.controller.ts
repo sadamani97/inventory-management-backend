@@ -29,6 +29,9 @@ export const LoginController = async (req: Request, res: Response) => {
             });
         }
         const response = await loginService(result.data);
+        if(!response.success){
+          return res.status(400).json(response);
+        }
         res.status(200).json(response);
     } catch (error) {
     console.error("Login error occurred:", error);

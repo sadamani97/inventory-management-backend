@@ -8,7 +8,7 @@ export interface ProductAttributes{
     productName:string;
     sku:string;
     barcode:string;
-    category:string;
+    categoryId:number;
     brand:string;
     purchaseRate:number;
     sellingPrice:number;
@@ -27,7 +27,7 @@ implements ProductAttributes{
     public productName!: string;
     public sku!: string;
     public barcode!: string;
-    public category!: string;
+    public categoryId!: number;
     public brand!: string;
     public purchaseRate!: number;
     public sellingPrice!: number;
@@ -58,9 +58,13 @@ Product.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    category: {
-        type: DataTypes.STRING,
+    categoryId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: "categories",
+            key: "categoryId",
+        },
     },
     brand: {
         type: DataTypes.STRING,
