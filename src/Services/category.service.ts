@@ -1,35 +1,36 @@
-import {Category} from "../models/categories.model.js"
-
+import { Category } from "../models/product/categories.model.js"
+import { Op } from "sequelize"
 class CategoryService {
-    async create(data:any){
-        const exists =await Category.findOne({
-            where:{
-                categoryName:data.categoryName,
-            },            
+    async create(data: any) {
+        const exists = await Category.findOne({
+            where: {
+                categoryName: data.categoryName,
+            },
         })
         if (exists) {
-            throw new Error ("category already exists")
+            throw new Error("category already exists")
         }
         return await Category.create(data)
     }
-    async findAll(){
+    async findAll() {
         return await Category.findAll()
     }
-    async FindById(id:number){
+    async FindById(id: number) {
         const category = await Category.findByPk(id)
-        if(!category){
+        if (!category) {
             throw new Error("Category not found")
         }
         return category
     }
-    async Update(id:number,data:any){
+    async Update(id: number, data: any) {
         const category = await Category.findByPk(id)
-        if(!category){
+        if (!category) {
             throw new Error("Category not found")
         }
         const exists = await Category.findOne({
-            where:{
-                categoryName:data.categoryName,
+            where: {
+                categoryName: data.categoryName,
+                categoryId: { [Op.ne]: id }
             },
         })
         if (exists) {
@@ -38,9 +39,9 @@ class CategoryService {
         await category.update(data)
         return category
     }
-    async Delete(id:number){
+    async Delete(id: number) {
         const category = await Category.findByPk(id)
-        if(!category){
+        if (!category) {
             throw new Error("Category not found")
         }
         return category.destroy()

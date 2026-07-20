@@ -1,39 +1,39 @@
 import { DataTypes, Model, type Optional } from "sequelize";
-import { sequelize } from "../config/db.js"
+import { sequelize } from "../../config/db.js"
 
 
 
-export interface ProductAttributes{
-    id:number;
-    productName:string;
-    sku:string;
-    barcode:string;
-    categoryId:number;
-    brand:string;
-    purchaseRate:number;
-    sellingPrice:number;
-    quantity:number;
-    lowStockLimit:number,
-    unit:string,
-    status:string,
-    description:string,
-    addVarient:string;
+export interface ProductAttributes {
+    id: number;
+    productName: string;
+    sku: string;
+    barcode: string;
+    categoryId: number;
+    brandId: string;
+    purchaseRate: number;
+    sellingPrice: number;
+    quantity: number;
+    lowStockLimit: number,
+    unitId: string,
+    status: string,
+    description: string,
+    addVarient: string;
 }
-interface productCreation extends Optional<ProductAttributes, "id"> {}
-export class Product 
-extends Model<ProductAttributes, productCreation>
-implements ProductAttributes{
+interface productCreation extends Optional<ProductAttributes, "id"> { }
+export class Product
+    extends Model<ProductAttributes, productCreation>
+    implements ProductAttributes {
     public id!: number;
     public productName!: string;
     public sku!: string;
     public barcode!: string;
     public categoryId!: number;
-    public brand!: string;
+    public brandId!: string;
     public purchaseRate!: number;
     public sellingPrice!: number;
     public quantity!: number;
     public lowStockLimit!: number;
-    public unit!: string;
+    public unitId!: string;
     public status!: string;
     public description!: string;
     public addVarient!: string;
@@ -61,14 +61,13 @@ Product.init({
     categoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: "categories",
-            key: "categoryId",
-        },
+
     },
-    brand: {
-        type: DataTypes.STRING,
+    brandId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
+
+
     },
     purchaseRate: {
         type: DataTypes.INTEGER,
@@ -86,12 +85,12 @@ Product.init({
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    unit: {
-        type: DataTypes.STRING,
+    unitId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM("Active","Inactive"),
+        type: DataTypes.ENUM("Active", "Inactive"),
         allowNull: false,
     },
     description: {

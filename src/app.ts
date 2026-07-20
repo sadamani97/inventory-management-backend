@@ -6,6 +6,7 @@ import productRoutes from "./Routes/product.route.js"
 import vendorRoutes from "./Routes/vendor.route.js"
 import {CategoryRouter} from "./Routes/category.route.js";
 
+
 const app = express();
 
 app.use(cors());
