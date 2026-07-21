@@ -1,4 +1,4 @@
-import { Brand } from "../models/product/brand.model.js"
+import { Brand } from "../../models/product/brand.model.js"
 import { Op } from "sequelize"
 class BrandService {
     async create(data: any) {

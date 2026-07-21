@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { BaseController } from "../baseController.js";
-import productService from "../../Services/product.service.js";
+import productService from "../../Services/producr.service/product.service.js";
 
 
 

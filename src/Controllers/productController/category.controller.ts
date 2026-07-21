@@ -1,5 +1,5 @@
 import { BaseController } from "../baseController.js";
-import { categoryService } from "../../Services/category.service.js";
+import { categoryService } from "../../Services/producr.service/category.service.js";
 
 
 export default new BaseController(categoryService, "category")

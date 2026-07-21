@@ -1,4 +1,4 @@
-import { Unit } from "../models/product/unit.model.js"
+import { Unit } from "../../models/product/unit.model.js"
 import { Op } from "sequelize"
 class UnitService {
     async create(data: any) {
@@ -30,7 +30,7 @@ class UnitService {
         const exists = await Unit.findOne({
             where: {
                 unitName: data.unitName,
-            
+
                 unitId: { [Op.ne]: id }
             },
         })

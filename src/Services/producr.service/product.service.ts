@@ -1,5 +1,6 @@
-import { Product } from "../models/product/product.model.js";
-import { Category } from "../models/product/categories.model.js";
+// import { Product } from "../models/product/product.model.js";
+// import { Category } from "../models/product/categories.model.js";
+import { Product, Category } from "../../models/index.js";
 
 
 class ProductService {
@@ -31,14 +32,18 @@ class ProductService {
             ],
         })
         if (!product) {
-            throw new Error("Product Not Found");
+           const error: any = new Error("product not found")
+        error.status=404
+        throw error
         }
         return product
     }
     async Update(id: number, data: any) {
         const product = await Product.findByPk(id)
         if (!product) {
-            throw new Error("Product not found")
+            const error :any= new Error("product not found")
+            error.status=404
+            throw error
         }
         await product.update(data)
         return product
@@ -46,7 +51,9 @@ class ProductService {
     async Delete(id: number) {
         const product = await Product.findByPk(id)
         if (!product) {
-            throw new Error("product not found")
+            const error :any= new Error("product not found");
+            error.status=404;
+            throw error;
         }
         return product.destroy()
     }

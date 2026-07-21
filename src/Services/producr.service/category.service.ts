@@ -1,4 +1,4 @@
-import { Category } from "../models/product/categories.model.js"
+import { Category } from "../../models/product/categories.model.js"
 import { Op } from "sequelize"
 class CategoryService {
     async create(data: any) {
