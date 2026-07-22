@@ -1,6 +1,6 @@
 // import { Product } from "../models/product/product.model.js";
 // import { Category } from "../models/product/categories.model.js";
-import { Product, Category } from "../../models/index.js";
+import { Product, Category } from "../../models/product/index.js";
 
 
 class ProductService {

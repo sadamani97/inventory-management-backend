@@ -1,7 +1,7 @@
-import { Product } from "./product/product.model.js";
-import { Category } from "./product/categories.model.js";
-import { Brand } from "./product/brand.model.js";
-import { Unit } from "./product/unit.model.js";
+import { Product } from "./product.model.js";
+import { Category } from "./categories.model.js";
+import { Brand } from "./brand.model.js";
+import { Unit } from "./unit.model.js";
 
 
 

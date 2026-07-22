@@ -1,6 +1,5 @@
-import type { Request, Response } from "express";
-import { BaseController } from "./baseController.js";
-import vendorService from "../Services/vendor.service.js";
+import { BaseController } from "../baseController.js";
+import vendorService from "../../Services/vendorService/vendor.service.js";
 
 
 
