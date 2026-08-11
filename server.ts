@@ -4,6 +4,7 @@ import { logger } from "./src/config/logger.js";
 import { initDb } from "./src/config/db.js";
 import "./src/models/product/index.js";
 import "./src/models/vendor/index.js";
+import "./src/models/transctionModel/index.js";
 
 
 const startServer = async () => {

@@ -19,6 +19,12 @@ import addressRoutes from "./Routes/vendorRoutes/address.route.js";
 import vendorContactRoutes from "./Routes/vendorRoutes/vendorContact.route.js";
 import vendorBankDetailsRoutes from "./Routes/vendorRoutes/vendorBankDetails.route.js";
 
+// Transaction / Purchase Order Routes
+import purchaseOrderRoutes from "./Routes/transactionRoute/purchaseOrder.route.js";
+import purchaseOrderItemRoutes from "./Routes/transactionRoute/purchaseOrderItem.route.js";
+import purchaseOrderActivityRoutes from "./Routes/transactionRoute/purchaseOrderActivity.route.js";
+import createPORoutes from "./Routes/transactionRoute/createPO.route.js";
+
 const app = express();
 
 app.use(cors());
@@ -42,6 +48,12 @@ app.use("/api/cities", cityRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/vendor-contacts", vendorContactRoutes);
 app.use("/api/vendor-bank-details", vendorBankDetailsRoutes);
+
+// Purchase Order Module Routes
+app.use("/api/purchase-orders", purchaseOrderRoutes);
+app.use("/api/purchase-order-items", purchaseOrderItemRoutes);
+app.use("/api/purchase-order-activities", purchaseOrderActivityRoutes);
+app.use("/api/create-po", createPORoutes);
 
 app.use(errorHandler);
 
