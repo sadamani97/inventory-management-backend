@@ -1,0 +1,555 @@
+{
+  "info": {
+    "_postman_id": "47ae8f5a-1b9b-4480-b63e-a3de683bcab4",
+    "name": "inventory-management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50520371",
+    "_collection_link": "https://go.postman.co/collection/50520371-47ae8f5a-1b9b-4480-b63e-a3de683bcab4?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Signup",
+      "item": [
+        {
+          "name": "signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstname\": \"John\",\r\n  \"lastname\": \"Doe\",\r\n  \"email\": \"sadamani@example.com\",\r\n  \"password\": \"Sada@5497\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/signup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "login",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"sadamani@example.com\",\r\n    \"password\": \"Sada@5497\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "catagory",
+          "item": [
+            {
+              "name": "createCategory",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"categoryName\": \"Grocery\",\r\n    \"description\": \"Daily grocery products\",\r\n    \"status\": \"Active\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/Categories/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "Categories",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getAllCategory",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/Categories/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "Categories",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getOneCategory",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/Categories/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "Categories",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "updateCategory",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"categoryName\": \"Dairy\",\r\n    \"description\": \"Daily Dairy products \",\r\n    \"status\": \"Active\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/Categories/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "Categories",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "products Crud",
+          "item": [
+            {
+              "name": "createProduct",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"productName\": \"Mazha 1500ml\",\r\n  \"sku\": \"MAZA-1L-02\",\r\n  \"barcode\": \"890156932456890\",\r\n  \"categoryId\": 1,\r\n  \"brandId\": 1,\r\n  \"purchaseRate\": 45,\r\n  \"sellingPrice\": 90,\r\n  \"quantity\": 120,\r\n  \"lowStockLimit\": 20,\r\n  \"unitId\": 1,\r\n  \"status\": \"Active\",\r\n  \"description\": \"Mazha Cool Drink Bottel\",\r\n  \"addVarient\":\"Zero Diet\"\r\n  \r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/products/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "products",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getAllProduct",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/products/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "products",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getOneProduct",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/products/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "products",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "deleteProduct",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/products/2",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "products",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "updateProduct",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": " {\r\n            \"id\": 2,\r\n            \"productName\": \"Coca Cola 1L\",\r\n            \"sku\": \"COKE-1L-014\",\r\n            \"barcode\": \"890123232347890\",\r\n            \"categoryId\": 1,\r\n            \"brand\": \"Cola\",\r\n            \"purchaseRate\": 50,\r\n            \"sellingPrice\": 95,\r\n            \"quantity\": 120,\r\n            \"lowStockLimit\": 20,\r\n            \"unit\": \"Bottel\",\r\n            \"status\": \"Active\",\r\n            \"description\": \"Coco Cola Bottel\",\r\n            \"addVarient\": \"Suger Free\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/products/2",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "products",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "brand",
+          "item": [
+            {
+              "name": "createBrand",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"brandName\":\"maza 2.5L\",\r\n    \"brandId\":1\r\n    }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/brands/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "brands",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getbrand",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/brands/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "brands",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "updateBand",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"brandName\":\"maza 2.5L\",\r\n    \"brandId\":12\r\n    }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/brands/2",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "brands",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "deleteBrand",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/brands/2",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "brands",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "unit",
+          "item": [
+            {
+              "name": "createUnit",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"unitName\":\"ml\",\r\n    \"quantity\":10\r\n\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/units/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "units",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vendor",
+      "item": [
+        {
+          "name": "createVendor",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"vendorName\": \"Fresh Foods\",\r\n  \"companyName\": \"Fresh Foods India\",\r\n  \"vendorType\": \"Distributor\",\r\n  \"contactPersonName\": \"Suresh\",\r\n  \"phoneNumber\": 876041230,\r\n  \"emailAddress\": \"info@freshfoods.com\",\r\n  \"website\": \"https://www.freshfoods.com\",\r\n  \"addressLine\": \"45 Gandhi Road\",\r\n  \"city\": \"Coimbatore\",\r\n  \"state\": \"Tamil Nadu\",\r\n  \"country\": \"India\",\r\n  \"pincode\": 641001\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vendors/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "vendors",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
