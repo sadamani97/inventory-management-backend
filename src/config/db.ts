@@ -7,10 +7,6 @@ export const sequelize = new Sequelize(env.DATABASE_URL, {
   logging: false,
 });
 
-// Import User model to register it before syncing
-import { User } from "../models/User.js";
-
-
 export const initDb = async () => {
   try {
     console.log("Initializing database connection...");

@@ -32,4 +32,6 @@ const main = async () => {
   }
 };
 
-main();
+if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("salesOrderMigration.cli.ts")) {
+  main();
+}

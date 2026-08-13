@@ -14,15 +14,15 @@ class PurchaseOrderService extends BaseService<any> {
 
     // Overriding create to handle line items + transactional activity logging
     async create(data: any) {
-        const { items, ...orderData } = data;
+        const { items, ...orderData } = data ?? {};
 
         const po = await PurchaseOrder.create(orderData);
 
-        if (items && items.length > 0) {
+        if (items?.length > 0) {
             const lineItems = items.map((item: any) => ({
                 ...item,
                 purchaseOrderId: po.id,
-                totalPrice: item.quantity * item.unitPrice,
+                totalPrice: Number((item?.quantity ?? 0) * (item?.unitPrice ?? 0)),
             }));
             await PurchaseOrderItem.bulkCreate(lineItems);
         }

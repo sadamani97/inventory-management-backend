@@ -1,7 +1,6 @@
 import { PurchaseOrder } from "./purchaseOrder.model.js";
 import { PurchaseOrderItem } from "./purchaseOrderItem.model.js";
 import { PurchaseOrderActivity } from "./purchaseOrderActivity.model.js";
-import { createPO } from "./createPO.model.js";
 
 import { Vendor, Address, VendorContact } from "../vendor/index.js";
 import { Product } from "../product/product.model.js";
@@ -39,7 +38,6 @@ export {
     PurchaseOrder,
     PurchaseOrderItem,
     PurchaseOrderActivity,
-    createPO,
 };
 
 
