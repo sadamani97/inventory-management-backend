@@ -1,5 +1,6 @@
 // import { Product } from "../models/product/product.model.js";
 // import { Category } from "../models/product/categories.model.js";
+import { Op } from "sequelize";
 import { Product, Category } from "../../models/product/index.js";
 
 
@@ -56,6 +57,65 @@ class ProductService {
             throw error;
         }
         return product.destroy()
+    }
+
+    async getProductStats() {
+        const totalCount = await Product.count();
+
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const addedThisMonthCount = await Product.count({
+            where: {
+                createdAt: {
+                    [Op.gte]: startOfMonth,
+                },
+            },
+        });
+
+        const activeStockCount = await Product.count({
+            where: {
+                quantity: {
+                    [Op.gt]: 10,
+                },
+            },
+        });
+
+        const lowStockCount = await Product.count({
+            where: {
+                quantity: {
+                    [Op.gt]: 0,
+                    [Op.lte]: 10,
+                },
+            },
+        });
+
+        const outOfStockCount = await Product.count({
+            where: {
+                quantity: {
+                    [Op.lte]: 0,
+                },
+            },
+        });
+
+        const restockedSum: any = await Product.sum("quantity", {
+            where: {
+                createdAt: {
+                    [Op.gte]: startOfMonth,
+                },
+            },
+        });
+        const unitsRestockedThisMonth = Number(restockedSum ?? 0);
+
+        return {
+            totalProducts: totalCount,
+            addedThisMonth: addedThisMonthCount,
+            activeStock: activeStockCount,
+            lowStock: lowStockCount,
+            outOfStock: outOfStockCount,
+            unitsRestockedThisMonth: unitsRestockedThisMonth,
+        };
     }
 }
 

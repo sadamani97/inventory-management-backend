@@ -3,6 +3,7 @@ import { SalesOrder, SalesOrderItem } from "../../models/salesOrder/index.js";
 import { Product } from "../../models/product/product.model.js";
 import { User } from "../../models/User.js";
 import { calculateSalesOrderTotals, normalizeSalesOrderPayload } from "../../utils/salesOrder.utils.js";
+import { formatCurrency } from "../../utils/memo.utils.js";
 
 class SalesOrderService extends BaseService<any> {
   constructor() {
@@ -106,8 +107,23 @@ class SalesOrderService extends BaseService<any> {
     const pendingCount = await SalesOrder.count({ where: { status: "Pending" } });
     const draftCount = await SalesOrder.count({ where: { status: "Draft" } });
 
+    const sumResult: any = await SalesOrder.sum("totalAmount");
+    const totalOrderValue = Number(sumResult ?? 0);
+    const averageOrderValue = totalCount > 0 ? Number((totalOrderValue / totalCount).toFixed(2)) : 0;
+
+    const activeBuyers = await SalesOrder.count({
+      distinct: true,
+      col: "customerName",
+    });
+
     return {
+      totalSalesOrders: totalCount,
       totalOrders: totalCount,
+      totalOrderValue,
+      totalOrderValueFormatted: formatCurrency(totalOrderValue),
+      averageOrderValue,
+      averageOrderValueFormatted: `₹${averageOrderValue}`,
+      activeBuyers,
       paidOrders: paidCount,
       pendingOrders: pendingCount,
       draftOrders: draftCount,

@@ -5,6 +5,7 @@ import vendorController from "../../Controllers/vendorControllers/vendor.control
 
 const router = Router();
 
+router.get("/stats", vendorController.getStats);
 router.post("/", validate(createVendorSchema), vendorController.create);
 router.get("/", vendorController.findAll);
 router.get("/:id", vendorController.FindById);

@@ -1,9 +1,27 @@
+import type { Request, Response, NextFunction } from "express";
 import { BaseController } from "../baseController.js";
 import vendorService from "../../Services/vendorService/vendor.service.js";
 
+class VendorController extends BaseController<any> {
+  constructor() {
+    super(vendorService, "vendor");
+  }
 
+  getStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const stats = await vendorService.getVendorStats();
+      res.status(200).json({
+        success: true,
+        message: "Vendor statistics fetched successfully",
+        data: stats,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
 
-export default new BaseController(vendorService, "vendor")
+export default new VendorController();
 
 
 

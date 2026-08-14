@@ -111,15 +111,24 @@ class PurchaseOrderService extends BaseService<any> {
     // Custom method for Stats
     async getPOStats() {
         const totalCount = await PurchaseOrder.count();
-        const pendingCount = await PurchaseOrder.count({ where: { status: "Pending" } });
+        const pendingCount = await PurchaseOrder.count({
+            where: {
+                status: ["Pending", "Draft", "Approved", "Shipped"],
+            },
+        });
         const completedCount = await PurchaseOrder.count({ where: { status: "Delivered" } });
         const cancelledCount = await PurchaseOrder.count({ where: { status: "Cancelled" } });
 
+        const sumResult: any = await PurchaseOrder.sum("totalAmount");
+        const totalPOValue = Number(sumResult ?? 0);
+
         return {
+            totalPurchaseOrders: totalCount,
             totalOrders: totalCount,
             pendingOrders: pendingCount,
             completedOrders: completedCount,
             cancelledOrders: cancelledCount,
+            totalPOValue,
         };
     }
 }

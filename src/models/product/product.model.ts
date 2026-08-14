@@ -18,6 +18,8 @@ export interface ProductAttributes {
     status: string,
     description: string,
     addVarient: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 interface productCreation extends Optional<ProductAttributes, "id"> { }
 export class Product

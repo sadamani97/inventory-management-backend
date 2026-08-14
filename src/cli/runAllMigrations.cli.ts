@@ -3,6 +3,7 @@ import { ensureProductTables } from "./productMigration.cli.js";
 import { ensureVendorTables } from "./vendorMigration.cli.js";
 import { ensurePurchaseOrderTables } from "./purchaseOrderMigration.cli.js";
 import { ensureSalesOrderTables } from "./salesOrderMigration.cli.js";
+import { ensureInvoiceTables } from "./invoiceMigration.cli.js";
 
 export const runAllMigrations = async () => {
   console.log("Starting full database migrations...\n");
@@ -18,6 +19,9 @@ export const runAllMigrations = async () => {
 
   console.log("\n--- 4. Sales Order Tables ---");
   await ensureSalesOrderTables();
+
+  console.log("\n--- 5. Invoice Tables ---");
+  await ensureInvoiceTables();
 
   console.log("\nAll migrations executed successfully!");
 };

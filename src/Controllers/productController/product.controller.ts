@@ -1,10 +1,27 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { BaseController } from "../baseController.js";
 import productService from "../../Services/producr.service/product.service.js";
 
+class ProductController extends BaseController<any> {
+  constructor() {
+    super(productService, "product");
+  }
 
+  getStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const stats = await productService.getProductStats();
+      res.status(200).json({
+        success: true,
+        message: "Product statistics fetched successfully",
+        data: stats,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
 
-export default new BaseController(productService, "product")
+export default new ProductController();
 
 
 

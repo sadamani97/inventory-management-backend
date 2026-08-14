@@ -9,6 +9,8 @@ export interface VendorAttributes {
     website: string;
     gstin:string;
     status:string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface vendorCreation extends Optional<VendorAttributes, "vendorId"> { }
