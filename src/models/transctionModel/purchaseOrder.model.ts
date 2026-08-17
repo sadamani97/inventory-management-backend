@@ -20,6 +20,8 @@ export interface PurchaseOrderAttributes {
     discountAmount: number;
     totalAmount: number;
     createdById?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface PurchaseOrderCreationAttributes extends Optional<PurchaseOrderAttributes, "id" | "status" | "paymentStatus" | "subtotal" | "taxPercentage" | "taxAmount" | "discountAmount"> {}

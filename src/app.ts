@@ -65,6 +65,13 @@ app.use("/api/sales-orders", salesOrderRoutes);
 // Invoice Module Routes
 app.use("/api/invoices", invoiceRoutes);
 
+// Alerts & Reports Module Routes
+import alertRoutes from "./Routes/alertRoutes/alert.route.js";
+import reportRoutes from "./Routes/reportRoutes/report.route.js";
+
+app.use("/api/alerts", alertRoutes);
+app.use("/api/reports", reportRoutes);
+
 app.use(errorHandler);
 
 export default app;

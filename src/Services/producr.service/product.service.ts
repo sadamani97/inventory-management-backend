@@ -2,11 +2,16 @@
 // import { Category } from "../models/product/categories.model.js";
 import { Op } from "sequelize";
 import { Product, Category } from "../../models/product/index.js";
+import { alertService } from "../alertService/alert.service.js";
 
 
 class ProductService {
     async create(data: any) {
-        return await Product.create(data)
+        const product = await Product.create(data);
+        if (product) {
+            await alertService.checkAndSyncProductAlerts(product);
+        }
+        return product;
     }
 
 
@@ -46,7 +51,8 @@ class ProductService {
             error.status=404
             throw error
         }
-        await product.update(data)
+        await product.update(data);
+        await alertService.checkAndSyncProductAlerts(product);
         return product
     }
     async Delete(id: number) {

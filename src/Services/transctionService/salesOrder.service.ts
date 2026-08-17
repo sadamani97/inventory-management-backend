@@ -4,6 +4,7 @@ import { Product } from "../../models/product/product.model.js";
 import { User } from "../../models/User.js";
 import { calculateSalesOrderTotals, normalizeSalesOrderPayload } from "../../utils/salesOrder.utils.js";
 import { formatCurrency } from "../../utils/memo.utils.js";
+import { alertService } from "../alertService/alert.service.js";
 
 class SalesOrderService extends BaseService<any> {
   constructor() {
@@ -40,6 +41,18 @@ class SalesOrderService extends BaseService<any> {
       }));
 
       await SalesOrderItem.bulkCreate(rows);
+
+      // Reduce product stock & check stock alerts
+      for (const item of items) {
+        if (item.productId) {
+          const prod = await Product.findByPk(item.productId);
+          if (prod) {
+            const newQty = Math.max(0, prod.quantity - Number(item.quantity ?? 1));
+            await prod.update({ quantity: newQty });
+            await alertService.checkAndSyncProductAlerts(prod);
+          }
+        }
+      }
     }
 
     return salesOrder;

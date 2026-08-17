@@ -14,6 +14,8 @@ export interface SalesOrderAttributes {
   totalAmount: number;
   orderDate?: Date;
   createdById?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface SalesOrderCreationAttributes extends Optional<SalesOrderAttributes, "id" | "status" | "subtotal" | "discountAmount" | "totalAmount"> {}
