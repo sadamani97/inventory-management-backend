@@ -23,6 +23,22 @@ class SalesOrderService extends BaseService<any> {
       throw new Error("Sales order already exists");
     }
 
+    // Validate product availability and stock level
+    if (Array.isArray(items) && items.length > 0) {
+      for (const item of items) {
+        if (!item.productId) {
+          throw new Error("Product ID is required for all order items");
+        }
+        const prod = await Product.findByPk(item.productId);
+        if (!prod) {
+          throw new Error(`Product not available: Product with ID ${item.productId} was not found in inventory.`);
+        }
+        if (prod.quantity < Number(item.quantity ?? 1)) {
+          throw new Error(`Out of stock product: ${prod.productName}. Available stock: ${prod.quantity}, requested: ${item.quantity}.`);
+        }
+      }
+    }
+
     const salesOrder = await SalesOrder.create({
       ...payload,
       subtotal: payload.subtotal ?? 0,
@@ -162,9 +178,43 @@ class SalesOrderService extends BaseService<any> {
       throw error;
     }
 
+    // Validate product availability and stock level
+    if (Array.isArray(payload.items) && payload.items.length > 0) {
+      for (const item of payload.items) {
+        if (!item.productId) {
+          throw new Error("Product ID is required for all order items");
+        }
+        const prod = await Product.findByPk(item.productId);
+        if (!prod) {
+          throw new Error(`Product not available: Product with ID ${item.productId} was not found in inventory.`);
+        }
+        // Exclude the currently existing sales order item's quantity since they are updating the order.
+        // Wait, since we destroy old items and recreate them, we want to check if the new quantity is available.
+        // To be safe, we check if the quantity is within stock (or stock + previously ordered quantity if the product is the same).
+        const existingItem = await SalesOrderItem.findOne({
+          where: { salesOrderId: id, productId: item.productId }
+        });
+        const currentOrderedQty = existingItem ? Number(existingItem.quantity) : 0;
+        const availableStock = prod.quantity + currentOrderedQty;
+
+        if (availableStock < Number(item.quantity ?? 1)) {
+          throw new Error(`Out of stock product: ${prod.productName}. Available stock: ${availableStock}, requested: ${item.quantity}.`);
+        }
+      }
+    }
+
     await record.update(updatedPayload);
 
     if (Array.isArray(payload.items) && payload.items.length > 0) {
+      // Restore stock for old items first
+      const oldItems = await SalesOrderItem.findAll({ where: { salesOrderId: id } });
+      for (const oldItem of oldItems) {
+        const prod = await Product.findByPk(oldItem.productId);
+        if (prod) {
+          await prod.update({ quantity: prod.quantity + Number(oldItem.quantity) });
+        }
+      }
+
       await SalesOrderItem.destroy({ where: { salesOrderId: id } });
 
       await SalesOrderItem.bulkCreate(
@@ -177,6 +227,16 @@ class SalesOrderService extends BaseService<any> {
           totalPrice: Number((item.quantity ?? 1) * (item.unitPrice ?? 0)),
         }))
       );
+
+      // Reduce product stock for new quantities & check stock alerts
+      for (const item of payload.items) {
+        const prod = await Product.findByPk(item.productId);
+        if (prod) {
+          const newQty = Math.max(0, prod.quantity - Number(item.quantity ?? 1));
+          await prod.update({ quantity: newQty });
+          await alertService.checkAndSyncProductAlerts(prod);
+        }
+      }
     }
 
     return record;
