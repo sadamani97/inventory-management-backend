@@ -4,11 +4,11 @@ import { sequelize } from "../../config/db.js";
 export interface SalesOrderAttributes {
   id: number;
   orderNumber: string;
-  customerType: "Walk In Customer" | "Retail Customer" | "Wholesale Customer" | "Online Customer";
+  customerType: "Walk In Customer" | "Retail Customer" | "Wholesale Customer" | "Online Customer" | "Corporate Customer" | "Distributor";
   customerName?: string;
   phone?: string;
-  status: "Draft" | "Paid" | "Pending" | "Cancelled" | "Completed";
-  paymentMode: "Cash" | "UPI" | "Card";
+  status: "Draft" | "Paid" | "Pending" | "Processing" | "Shipped" | "Completed" | "Cancelled" | "Returned" | "Failed";
+  paymentMode: "Cash" | "UPI" | "Card" | "Net Banking" | "Credit" | "Cheque" | "Bank Transfer";
   subtotal: number;
   discountAmount: number;
   totalAmount: number;
@@ -26,11 +26,11 @@ export class SalesOrder
 {
   public id!: number;
   public orderNumber!: string;
-  public customerType!: "Walk In Customer" | "Retail Customer" | "Wholesale Customer" | "Online Customer";
+  public customerType!: "Walk In Customer" | "Retail Customer" | "Wholesale Customer" | "Online Customer" | "Corporate Customer" | "Distributor";
   public customerName?: string;
   public phone?: string;
-  public status!: "Draft" | "Paid" | "Pending" | "Cancelled" | "Completed";
-  public paymentMode!: "Cash" | "UPI" | "Card";
+  public status!: "Draft" | "Paid" | "Pending" | "Processing" | "Shipped" | "Completed" | "Cancelled" | "Returned" | "Failed";
+  public paymentMode!: "Cash" | "UPI" | "Card" | "Net Banking" | "Credit" | "Cheque" | "Bank Transfer";
   public subtotal!: number;
   public discountAmount!: number;
   public totalAmount!: number;
@@ -52,7 +52,7 @@ SalesOrder.init(
       unique: true,
     },
     customerType: {
-      type: DataTypes.ENUM("Walk In Customer", "Retail Customer", "Wholesale Customer", "Online Customer"),
+      type: DataTypes.ENUM("Walk In Customer", "Retail Customer", "Wholesale Customer", "Online Customer", "Corporate Customer", "Distributor"),
       allowNull: false,
     },
     customerName: {
@@ -64,12 +64,12 @@ SalesOrder.init(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM("Draft", "Paid", "Pending", "Cancelled", "Completed"),
+      type: DataTypes.ENUM("Draft", "Paid", "Pending", "Processing", "Shipped", "Completed", "Cancelled", "Returned", "Failed"),
       allowNull: false,
       defaultValue: "Draft",
     },
     paymentMode: {
-      type: DataTypes.ENUM("Cash", "UPI", "Card"),
+      type: DataTypes.ENUM("Cash", "UPI", "Card", "Net Banking", "Credit", "Cheque", "Bank Transfer"),
       allowNull: false,
       defaultValue: "Cash",
     },

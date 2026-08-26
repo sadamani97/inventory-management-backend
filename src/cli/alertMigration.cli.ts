@@ -1,21 +1,77 @@
 import { sequelize } from "../config/db.js";
-import { Alert } from "../models/alert/index.js";
+import { DataTypes } from "sequelize";
 
 export const ensureAlertTables = async () => {
   const queryInterface = sequelize.getQueryInterface();
   const tables = await queryInterface.showAllTables();
   const tableSet = new Set(tables.map((table) => String(table)));
 
-  const syncIfMissing = async (tableName: string, syncFn: () => Promise<any>) => {
+  const createIfMissing = async (tableName: string, attributes: any) => {
     if (!tableSet.has(tableName)) {
-      await syncFn();
-      console.log(`Synced table: ${tableName}`);
+      await queryInterface.createTable(tableName, attributes);
+      console.log(`Created table: ${tableName}`);
     } else {
       console.log(`Table already exists: ${tableName}`);
     }
   };
 
-  await syncIfMissing("alerts", () => Alert.sync({ alter: false, force: false }));
+  await createIfMissing("alerts", {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    relatedItem: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    referenceId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    type: {
+      type: DataTypes.ENUM(
+        'LOW_STOCK',
+        'OUT_OF_STOCK',
+        'ITEM_EXPIRING',
+        'VENDOR_DELAY',
+        'PAYMENT_REMINDER',
+        'SHIPMENT_DELAY',
+        'CANCELLED_PO',
+        'PAYMENT_OVERDUE',
+        'EXPIRED_ITEM'
+      ),
+      allowNull: false,
+      defaultValue: 'LOW_STOCK',
+    },
+    severity: {
+      type: DataTypes.ENUM('Critical', 'High', 'Medium', 'Low'),
+      allowNull: false,
+      defaultValue: 'Medium',
+    },
+    status: {
+      type: DataTypes.ENUM('Active', 'Delayed', 'In Transit', 'Pending', 'Cancelled', 'Resolved', 'Acknowledged'),
+      allowNull: false,
+      defaultValue: 'Active',
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+  });
 
   console.log("Alert schema is ready");
 };

@@ -13,8 +13,14 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
         });
     }
 
-    const status = err?.status || err?.statusCode || 500;
+    // Determine status code
+    let status = err?.status || err?.statusCode || 500;
     const message = err?.message || "Internal server error";
+
+    // If the error message indicates a resource was not found, default status to 404
+    if (status === 500 && message && /[Nn]ot\s+[Ff]ound/.test(message)) {
+        status = 404;
+    }
 
     if (status >= 500) {
         console.error(err);

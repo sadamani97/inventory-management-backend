@@ -92,7 +92,7 @@ Product.init({
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM("Active", "Inactive"),
+        type: DataTypes.ENUM("Active", "Inactive", "Archived", "Draft", "Out of Stock"),
         allowNull: false,
     },
     description: {

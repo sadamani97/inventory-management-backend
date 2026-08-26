@@ -6,9 +6,9 @@ export interface AlertAttributes {
     title: string;
     relatedItem: string;
     referenceId?: string;
-    type: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'ITEM_EXPIRING' | 'VENDOR_DELAY' | 'PAYMENT_REMINDER' | 'SHIPMENT_DELAY' | 'CANCELLED_PO';
+    type: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'ITEM_EXPIRING' | 'VENDOR_DELAY' | 'PAYMENT_REMINDER' | 'SHIPMENT_DELAY' | 'CANCELLED_PO' | 'PAYMENT_OVERDUE' | 'EXPIRED_ITEM';
     severity: 'Critical' | 'High' | 'Medium' | 'Low';
-    status: 'Active' | 'Delayed' | 'In Transit' | 'Pending' | 'Cancelled' | 'Resolved';
+    status: 'Active' | 'Delayed' | 'In Transit' | 'Pending' | 'Cancelled' | 'Resolved' | 'Acknowledged';
     description?: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -21,9 +21,9 @@ export class Alert extends Model<AlertAttributes, AlertCreationAttributes> imple
     public title!: string;
     public relatedItem!: string;
     public referenceId?: string;
-    public type!: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'ITEM_EXPIRING' | 'VENDOR_DELAY' | 'PAYMENT_REMINDER' | 'SHIPMENT_DELAY' | 'CANCELLED_PO';
+    public type!: 'LOW_STOCK' | 'OUT_OF_STOCK' | 'ITEM_EXPIRING' | 'VENDOR_DELAY' | 'PAYMENT_REMINDER' | 'SHIPMENT_DELAY' | 'CANCELLED_PO' | 'PAYMENT_OVERDUE' | 'EXPIRED_ITEM';
     public severity!: 'Critical' | 'High' | 'Medium' | 'Low';
-    public status!: 'Active' | 'Delayed' | 'In Transit' | 'Pending' | 'Cancelled' | 'Resolved';
+    public status!: 'Active' | 'Delayed' | 'In Transit' | 'Pending' | 'Cancelled' | 'Resolved' | 'Acknowledged';
     public description?: string;
 }
 
@@ -55,7 +55,9 @@ Alert.init(
                 'VENDOR_DELAY',
                 'PAYMENT_REMINDER',
                 'SHIPMENT_DELAY',
-                'CANCELLED_PO'
+                'CANCELLED_PO',
+                'PAYMENT_OVERDUE',
+                'EXPIRED_ITEM'
             ),
             allowNull: false,
             defaultValue: 'LOW_STOCK',
@@ -66,7 +68,7 @@ Alert.init(
             defaultValue: 'Medium',
         },
         status: {
-            type: DataTypes.ENUM('Active', 'Delayed', 'In Transit', 'Pending', 'Cancelled', 'Resolved'),
+            type: DataTypes.ENUM('Active', 'Delayed', 'In Transit', 'Pending', 'Cancelled', 'Resolved', 'Acknowledged'),
             allowNull: false,
             defaultValue: 'Active',
         },

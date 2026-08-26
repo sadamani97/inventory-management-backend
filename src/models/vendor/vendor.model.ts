@@ -54,7 +54,7 @@ Vendor.init({
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM('active','inactive'),
+        type: DataTypes.ENUM('active', 'inactive', 'suspended', 'terminated'),
         allowNull: false,
         defaultValue: 'active',
     },

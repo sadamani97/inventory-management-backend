@@ -7,11 +7,6 @@
     "dev": "tsx watch server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "migrate:products": "tsx src/cli/productMigration.cli.ts",
-    "migrate:vendors": "tsx src/cli/vendorMigration.cli.ts",
-    "migrate:purchase-orders": "tsx src/cli/purchaseOrderMigration.cli.ts",
-    "migrate:sales-orders": "tsx src/cli/salesOrderMigration.cli.ts",
-    "migrate:invoices": "tsx src/cli/invoiceMigration.cli.ts",
     "migrate:all": "tsx src/cli/runAllMigrations.cli.ts"
   },
   "keywords": [],

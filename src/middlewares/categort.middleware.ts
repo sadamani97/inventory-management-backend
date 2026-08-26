@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
 import { createCategorySchema, updateCategorySchema } from "../Valitations/productValidation/category.validation.js";
-import { success } from "zod";
 
 export const validateCreateCategory = (
     req: Request,
@@ -11,7 +10,7 @@ export const validateCreateCategory = (
 
     if (!result.success) {
         return res.status(400).json({
-            success: true,
+            success: false,
             errors: result.error?.flatten().fieldErrors
         });
     }
@@ -29,7 +28,7 @@ export const validateUpdateCategory = (
 
     if (!result.success) {
         return res.status(400).json({
-            success: true,
+            success: false,
             errors: result.error?.flatten().fieldErrors
         });
     }

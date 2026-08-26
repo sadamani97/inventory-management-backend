@@ -8,8 +8,8 @@ export interface InvoiceAttributes {
   salesOrderNumber?: string;
   customerName: string;
   phone?: string;
-  status: "Draft" | "Paid" | "Pending" | "Cancelled";
-  paymentMethod: "Cash" | "UPI" | "Card" | "Net Banking" | "Credit";
+  status: "Draft" | "Paid" | "Pending" | "Partially Paid" | "Cancelled" | "Refunded" | "Overdue";
+  paymentMethod: "Cash" | "UPI" | "Card" | "Net Banking" | "Credit" | "Cheque" | "Bank Transfer";
   totalItems: number;
   subtotal: number;
   discountAmount: number;
@@ -42,8 +42,8 @@ export class Invoice
   public salesOrderNumber?: string;
   public customerName!: string;
   public phone?: string;
-  public status!: "Draft" | "Paid" | "Pending" | "Cancelled";
-  public paymentMethod!: "Cash" | "UPI" | "Card" | "Net Banking" | "Credit";
+  public status!: "Draft" | "Paid" | "Pending" | "Partially Paid" | "Cancelled" | "Refunded" | "Overdue";
+  public paymentMethod!: "Cash" | "UPI" | "Card" | "Net Banking" | "Credit" | "Cheque" | "Bank Transfer";
   public totalItems!: number;
   public subtotal!: number;
   public discountAmount!: number;
@@ -83,12 +83,12 @@ Invoice.init(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM("Draft", "Paid", "Pending", "Cancelled"),
+      type: DataTypes.ENUM("Draft", "Paid", "Pending", "Partially Paid", "Cancelled", "Refunded", "Overdue"),
       allowNull: false,
       defaultValue: "Paid",
     },
     paymentMethod: {
-      type: DataTypes.ENUM("Cash", "UPI", "Card", "Net Banking", "Credit"),
+      type: DataTypes.ENUM("Cash", "UPI", "Card", "Net Banking", "Credit", "Cheque", "Bank Transfer"),
       allowNull: false,
       defaultValue: "Cash",
     },
