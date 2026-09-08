@@ -12,14 +12,16 @@ export interface PurchaseOrderAttributes {
     shipmentMethod: string; 
     notes?: string;
     invoiceNumber?: string;
-    status: "Draft" | "Pending" | "Approved" | "Shipped" | "Delivered" | "Cancelled" | "Delayed";
-    paymentStatus: "NIL" | "Pending" | "Paid" | "Partially Paid";
+    status: "Draft" | "Pending" | "Approved" | "Shipped" | "Delivered" | "Partially Delivered" | "Cancelled" | "Delayed" | "Returned";
+    paymentStatus: "NIL" | "Pending" | "Paid" | "Partially Paid" | "Refunded" | "Failed";
     subtotal: number;
     taxPercentage: number;
     taxAmount: number;
     discountAmount: number;
     totalAmount: number;
     createdById?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface PurchaseOrderCreationAttributes extends Optional<PurchaseOrderAttributes, "id" | "status" | "paymentStatus" | "subtotal" | "taxPercentage" | "taxAmount" | "discountAmount"> {}
@@ -100,14 +102,16 @@ PurchaseOrder.init(
                 "Approved",
                 "Shipped",
                 "Delivered",
+                "Partially Delivered",
                 "Cancelled",
-                "Delayed"
+                "Delayed",
+                "Returned"
             ),
             defaultValue: "Draft",
             allowNull: false,
         },
         paymentStatus: {
-            type: DataTypes.ENUM("NIL", "Pending", "Paid", "Partially Paid"),
+            type: DataTypes.ENUM("NIL", "Pending", "Paid", "Partially Paid", "Refunded", "Failed"),
             defaultValue: "NIL",
             allowNull: false,
         },

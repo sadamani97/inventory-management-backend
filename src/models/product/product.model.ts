@@ -18,6 +18,8 @@ export interface ProductAttributes {
     status: string,
     description: string,
     addVarient: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 interface productCreation extends Optional<ProductAttributes, "id"> { }
 export class Product
@@ -90,7 +92,7 @@ Product.init({
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM("Active", "Inactive"),
+        type: DataTypes.ENUM("Active", "Inactive", "Archived", "Draft", "Out of Stock"),
         allowNull: false,
     },
     description: {

@@ -6,6 +6,7 @@ import { createProductSchema, updateProductSchema } from "../../Valitations/prod
 
 const router = Router();
 
+router.get('/stats', productController.getStats)
 router.post('/', validate(createProductSchema), productController.create)
 router.get('/', productController.findAll)
 router.get('/:id', productController.FindById)

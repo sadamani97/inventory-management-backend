@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./Routes/auth.route.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import { authenticateToken } from "./middlewares/auth.middleware.js";
 
 // Product Routes
 import productRoutes from "./Routes/product.rout/product.route.js";
@@ -23,15 +24,19 @@ import vendorBankDetailsRoutes from "./Routes/vendorRoutes/vendorBankDetails.rou
 import purchaseOrderRoutes from "./Routes/transactionRoute/purchaseOrder.route.js";
 import purchaseOrderItemRoutes from "./Routes/transactionRoute/purchaseOrderItem.route.js";
 import purchaseOrderActivityRoutes from "./Routes/transactionRoute/purchaseOrderActivity.route.js";
-import createPORoutes from "./Routes/transactionRoute/createPO.route.js";
+import salesOrderRoutes from "./Routes/transactionRoute/salesOrder.route.js";
+import invoiceRoutes from "./Routes/invoiceRoute/invoice.route.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Auth Route
+// Auth Route (Public: /signup, /login)
 app.use("/", authRoutes);
+
+// Protect all /api endpoints with JWT authentication
+app.use("/api", authenticateToken);
 
 // Product Module Routes
 app.use("/api/products", productRoutes);
@@ -53,7 +58,19 @@ app.use("/api/vendor-bank-details", vendorBankDetailsRoutes);
 app.use("/api/purchase-orders", purchaseOrderRoutes);
 app.use("/api/purchase-order-items", purchaseOrderItemRoutes);
 app.use("/api/purchase-order-activities", purchaseOrderActivityRoutes);
-app.use("/api/create-po", createPORoutes);
+
+// Sales Order Module Routes
+app.use("/api/sales-orders", salesOrderRoutes);
+
+// Invoice Module Routes
+app.use("/api/invoices", invoiceRoutes);
+
+// Alerts & Reports Module Routes
+import alertRoutes from "./Routes/alertRoutes/alert.route.js";
+import reportRoutes from "./Routes/reportRoutes/report.route.js";
+
+app.use("/api/alerts", alertRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.use(errorHandler);
 

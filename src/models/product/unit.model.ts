@@ -33,7 +33,14 @@ Unit.init({
             "tin",
             "box",
             "piece",
-            "bottle"
+            "bottle",
+            "bag",
+            "carton",
+            "dozen",
+            "set",
+            "meter",
+            "yard",
+            "inch"
         ),
         allowNull: false,
         validate: {

@@ -4,7 +4,7 @@ import { sequelize } from "../../config/db.js";
 export interface PurchaseOrderActivityAttributes {
     id: number;
     purchaseOrderId: number;
-    activityType: "PO Created" | "Delivery Received" | "PO Cancelled" | "Vendor Updated" | "Stock Updated";
+    activityType: "PO Created" | "PO Approved" | "PO Shipped" | "Delivery Received" | "PO Cancelled" | "Vendor Updated" | "Stock Updated" | "Payment Added" | "PO Edited";
     description: string;
     userId?: number;
 }
@@ -17,7 +17,7 @@ export class PurchaseOrderActivity
 {
     public id!: number;
     public purchaseOrderId!: number;
-    public activityType!: "PO Created" | "Delivery Received" | "PO Cancelled" | "Vendor Updated" | "Stock Updated";
+    public activityType!: "PO Created" | "PO Approved" | "PO Shipped" | "Delivery Received" | "PO Cancelled" | "Vendor Updated" | "Stock Updated" | "Payment Added" | "PO Edited";
     public description!: string;
     public userId?: number;
 }
@@ -37,10 +37,14 @@ PurchaseOrderActivity.init(
         activityType: {
             type: DataTypes.ENUM(
                 "PO Created",
+                "PO Approved",
+                "PO Shipped",
                 "Delivery Received",
                 "PO Cancelled",
                 "Vendor Updated",
-                "Stock Updated"
+                "Stock Updated",
+                "Payment Added",
+                "PO Edited"
             ),
             allowNull: false,
         },

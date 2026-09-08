@@ -14,15 +14,15 @@ class PurchaseOrderService extends BaseService<any> {
 
     // Overriding create to handle line items + transactional activity logging
     async create(data: any) {
-        const { items, ...orderData } = data;
+        const { items, ...orderData } = data ?? {};
 
         const po = await PurchaseOrder.create(orderData);
 
-        if (items && items.length > 0) {
+        if (items?.length > 0) {
             const lineItems = items.map((item: any) => ({
                 ...item,
                 purchaseOrderId: po.id,
-                totalPrice: item.quantity * item.unitPrice,
+                totalPrice: Number((item?.quantity ?? 0) * (item?.unitPrice ?? 0)),
             }));
             await PurchaseOrderItem.bulkCreate(lineItems);
         }
@@ -111,15 +111,24 @@ class PurchaseOrderService extends BaseService<any> {
     // Custom method for Stats
     async getPOStats() {
         const totalCount = await PurchaseOrder.count();
-        const pendingCount = await PurchaseOrder.count({ where: { status: "Pending" } });
+        const pendingCount = await PurchaseOrder.count({
+            where: {
+                status: ["Pending", "Draft", "Approved", "Shipped"],
+            },
+        });
         const completedCount = await PurchaseOrder.count({ where: { status: "Delivered" } });
         const cancelledCount = await PurchaseOrder.count({ where: { status: "Cancelled" } });
 
+        const sumResult: any = await PurchaseOrder.sum("totalAmount");
+        const totalPOValue = Number(sumResult ?? 0);
+
         return {
+            totalPurchaseOrders: totalCount,
             totalOrders: totalCount,
             pendingOrders: pendingCount,
             completedOrders: completedCount,
             cancelledOrders: cancelledCount,
+            totalPOValue,
         };
     }
 }

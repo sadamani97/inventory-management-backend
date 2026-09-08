@@ -8,17 +8,19 @@ import {
   DeleteUserController
 } from "../Controllers/auth.controller.js";
 import { Router } from "express";
+import { authenticateToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
+// Public routes
 router.post("/signup", SignupController);
 router.post("/login", LoginController);
 
-// User CRUD routes
-router.get("/users", GetUsersController);
-router.get("/users/:id", GetUserByIdController);
-router.post("/users", CreateUserController);
-router.put("/users/:id", UpdateUserController);
-router.delete("/users/:id", DeleteUserController);
+// Protected User CRUD routes
+router.get("/users", authenticateToken, GetUsersController);
+router.get("/users/:id", authenticateToken, GetUserByIdController);
+router.post("/users", authenticateToken, CreateUserController);
+router.put("/users/:id", authenticateToken, UpdateUserController);
+router.delete("/users/:id", authenticateToken, DeleteUserController);
 
 export default router;
