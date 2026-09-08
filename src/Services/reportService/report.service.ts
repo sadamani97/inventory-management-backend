@@ -149,7 +149,8 @@ export class ReportService {
                     sold: soldCount,
                     currentStock: prod?.quantity,
                     revenue,
-                    status: performanceStatus
+                    status: performanceStatus,
+                    createdAt: prod?.createdAt
                 };
             })
         );

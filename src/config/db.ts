@@ -105,8 +105,8 @@ export const initDb = async () => {
     await sequelize.authenticate();
     console.log("[Database] Connection established successfully.");
 
-    await sequelize.sync();
-    console.log("[Database] Models synchronized successfully.");
+    await sequelize.sync({ alter: true });
+    console.log("[Database] Models synchronized successfully with schema alter.");
   } catch (error) {
     console.error("[Database] Failed to initialize database:", error);
     throw error;

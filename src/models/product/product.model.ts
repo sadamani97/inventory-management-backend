@@ -17,7 +17,8 @@ export interface ProductAttributes {
     unitId: string,
     status: string,
     description: string,
-    addVarient: string;
+    imageUrl?: string;
+    addVarient?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -38,6 +39,7 @@ export class Product
     public unitId!: string;
     public status!: string;
     public description!: string;
+    public imageUrl!: string;
     public addVarient!: string;
 }
 
@@ -98,6 +100,10 @@ Product.init({
     description: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    imageUrl: {
+        type: DataTypes.TEXT("long"),
+        allowNull: true,
     },
     addVarient: {
         type: DataTypes.STRING,
