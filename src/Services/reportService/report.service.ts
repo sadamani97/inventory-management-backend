@@ -150,7 +150,7 @@ export class ReportService {
                     currentStock: prod?.quantity,
                     revenue,
                     status: performanceStatus,
-                    createdAt: prod?.createdAt
+                    createdAt: (prod as any)?.createdAt || new Date()
                 };
             })
         );

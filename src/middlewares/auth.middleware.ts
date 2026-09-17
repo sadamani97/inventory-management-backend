@@ -18,8 +18,10 @@ export const authenticateToken = (
       : null;
 
   if (!token) {
-    req.user = { id: 1, email: "admin@stockflow.com", role: "Admin" };
-    return next();
+    return res.status(401).json({
+      success: false,
+      message: "Access denied. No authentication token provided.",
+    });
   }
 
   try {
@@ -27,7 +29,9 @@ export const authenticateToken = (
     req.user = decoded;
     next();
   } catch (error) {
-    req.user = { id: 1, email: "admin@stockflow.com", role: "Admin" };
-    next();
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired authentication token.",
+    });
   }
 };
