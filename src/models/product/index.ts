@@ -2,9 +2,7 @@ import { Product } from "./product.model.js";
 import { Category } from "./categories.model.js";
 import { Brand } from "./brand.model.js";
 import { Unit } from "./unit.model.js";
-
-
-
+import { Vendor } from "../vendor/vendor.model.js";
 
 Product.belongsTo(Category, {
     foreignKey: "categoryId",
@@ -13,6 +11,18 @@ Product.belongsTo(Category, {
 
 Category.hasMany(Product, {
     foreignKey: "categoryId",
+    as: "products",
+});
+
+Product.belongsTo(Vendor, {
+    foreignKey: "vendorId",
+    targetKey: "vendorId",
+    as: "vendor",
+});
+
+Vendor.hasMany(Product, {
+    foreignKey: "vendorId",
+    sourceKey: "vendorId",
     as: "products",
 });
 
@@ -41,4 +51,5 @@ export {
     Category,
     Brand,
     Unit,
+    Vendor,
 }

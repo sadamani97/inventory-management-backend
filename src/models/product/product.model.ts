@@ -9,6 +9,7 @@ export interface ProductAttributes {
     sku: string;
     barcode: string;
     categoryId: number;
+    vendorId?: number;
     brandId: string;
     purchaseRate: number;
     sellingPrice: number;
@@ -31,6 +32,7 @@ export class Product
     public sku!: string;
     public barcode!: string;
     public categoryId!: number;
+    public vendorId?: number;
     public brandId!: string;
     public purchaseRate!: number;
     public sellingPrice!: number;
@@ -66,6 +68,10 @@ Product.init({
         type: DataTypes.INTEGER,
         allowNull: false,
 
+    },
+    vendorId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     },
     brandId: {
         type: DataTypes.INTEGER,

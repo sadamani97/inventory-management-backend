@@ -1,7 +1,6 @@
-// import { Product } from "../models/product/product.model.js";
-// import { Category } from "../models/product/categories.model.js";
 import { Op } from "sequelize";
 import { Product, Category, Brand, Unit } from "../../models/product/index.js";
+import { Vendor } from "../../models/vendor/vendor.model.js";
 import { alertService } from "../alertService/alert.service.js";
 
 
@@ -74,6 +73,11 @@ class ProductService {
                     as: "category",
                     attributes: ["categoryId", "categoryName"],
                 },
+                {
+                    model: Vendor,
+                    as: "vendor",
+                    attributes: ["vendorId", "vendorName"],
+                },
             ],
         })
     }
@@ -85,6 +89,11 @@ class ProductService {
                     model: Category,
                     as: "category",
                     attributes: ["categoryId", "categoryName"],
+                },
+                {
+                    model: Vendor,
+                    as: "vendor",
+                    attributes: ["vendorId", "vendorName"],
                 },
             ],
         })
