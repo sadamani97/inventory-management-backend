@@ -64,9 +64,13 @@ export const loginService = async (data: LoginInput) => {
       message: "Invalid email or password",
     };
   }
+  console.log("Entered Password:", password);
+  console.log("User:", user);
+  console.log("Stored Password:", user?.password);
 
   // 2. Compare password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const hashedPassword = user.getDataValue("password");
+  const isPasswordValid = await bcrypt.compare(password, hashedPassword);
 
   if (!isPasswordValid) {
     return {
@@ -77,7 +81,12 @@ export const loginService = async (data: LoginInput) => {
 
   // 3. Sign JWT
   const token = jwt.sign(
-    { id: user.id, email: user.email },
+    {
+      id: user.id,
+      email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
+    },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN as any }
   );
@@ -179,7 +188,7 @@ export const updateUserService = async (id: number, data: UpdateUserInput) => {
         message: "User not found"
       };
     }
-    
+
     if (data.email && data.email !== user.email) {
       const existingUser = await User.findOne({ where: { email: data.email } });
       if (existingUser) {

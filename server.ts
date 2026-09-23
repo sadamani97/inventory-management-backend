@@ -2,6 +2,10 @@ import app from "./src/app.js";
 import { env } from "./src/config/env.js";
 import { logger } from "./src/config/logger.js";
 import { initDb } from "./src/config/db.js";
+import "./src/models/product/index.js";
+import "./src/models/vendor/index.js";
+import "./src/models/transctionModel/index.js";
+
 
 const startServer = async () => {
   try {
