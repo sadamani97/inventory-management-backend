@@ -11,6 +11,7 @@ export interface VendorBankDetailsAttributes {
     branchName: string;
     vendorId: number;
     isPrimary: boolean;
+    upiId?: string;
 }
 
 interface vendorBankDetailsCreation extends Optional<VendorBankDetailsAttributes, "vendorBankDetailId"> { }
@@ -26,6 +27,7 @@ export class VendorBankDetails
     public branchName!: string;
     public vendorId!: number;
     public isPrimary!: boolean;
+    public upiId!: string;
 }
 
 VendorBankDetails.init({
@@ -67,6 +69,10 @@ VendorBankDetails.init({
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+    },
+    upiId: {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
 }, {
     sequelize,

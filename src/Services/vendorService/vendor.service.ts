@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { Vendor } from "../../models/vendor/vendor.model.js";
+import { Vendor, VendorType, Address, VendorContact, VendorBankDetails, Country, State, City } from "../../models/vendor/index.js";
 import { PurchaseOrder } from "../../models/transctionModel/index.js";
 
 class vendorService {
@@ -7,14 +7,44 @@ class vendorService {
         return await Vendor.create(data);
     }
     async findAll() {
-        return await Vendor.findAll();
+        return await Vendor.findAll({
+            include: [
+                { model: VendorType, as: "vendorType" },
+                { model: VendorContact, as: "contacts" },
+                { 
+                    model: Address, 
+                    as: "addresses",
+                    include: [
+                        { model: Country, as: "country" },
+                        { model: State, as: "state" },
+                        { model: City, as: "city" }
+                    ]
+                },
+                { model: VendorBankDetails, as: "bankDetails" }
+            ]
+        });
     }
     async FindById(id: number) {
-        const vendor = await Vendor.findByPk(id)
+        const vendor = await Vendor.findByPk(id, {
+            include: [
+                { model: VendorType, as: "vendorType" },
+                { 
+                    model: Address, 
+                    as: "addresses",
+                    include: [
+                        { model: Country, as: "country" },
+                        { model: State, as: "state" },
+                        { model: City, as: "city" }
+                    ]
+                },
+                { model: VendorContact, as: "contacts" },
+                { model: VendorBankDetails, as: "bankDetails" }
+            ]
+        });
         if (!vendor) {
             throw new Error("Vendor Not Found");
         }
-        return vendor
+        return vendor;
     }
     async Update(id: number, data: any) {
         const vendor = await Vendor.findByPk(id)
