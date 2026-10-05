@@ -19,6 +19,7 @@ export interface VendorAttributes {
     gstCertificate?: string;
     agreement?: string;
     vendorLogo?: string;
+    isStarred?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -44,6 +45,7 @@ export class Vendor
     public gstCertificate!: string;
     public agreement!: string;
     public vendorLogo!: string;
+    public isStarred!: boolean;
 }
 
 Vendor.init({
@@ -88,6 +90,11 @@ Vendor.init({
     gstCertificate: { type: DataTypes.STRING, allowNull: true },
     agreement: { type: DataTypes.STRING, allowNull: true },
     vendorLogo: { type: DataTypes.STRING, allowNull: true },
+    isStarred: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
 }, {
     sequelize,
     tableName: "vendors",

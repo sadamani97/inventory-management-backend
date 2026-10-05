@@ -8,6 +8,7 @@ const router = Router();
 router.get("/stats", vendorController.getStats);
 router.post("/", validate(createVendorSchema), vendorController.create);
 router.get("/", vendorController.findAll);
+router.patch("/:id/star", vendorController.setStarred);
 router.get("/:id", vendorController.FindById);
 router.put("/:id", vendorController.Update);
 router.delete("/:id", vendorController.Delete);
