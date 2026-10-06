@@ -73,7 +73,7 @@ class PurchaseOrderService extends BaseService<any> {
         // Log Activity
         await PurchaseOrderActivity.create({
             purchaseOrderId: po.id,
-            activityType: "PO Updated",
+            activityType: "PO Edited",
             description: `Purchase order ${po.poNumber} updated. Status: ${newStatus}`,
         });
 
