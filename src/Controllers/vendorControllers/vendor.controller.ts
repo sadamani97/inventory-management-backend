@@ -7,6 +7,28 @@ class VendorController extends BaseController<any> {
     super(vendorService, "vendor");
   }
 
+  setStarred = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = Number(req.params.id);
+      if (isNaN(id) || id <= 0) {
+        res.status(400).json({
+          success: false,
+          message: "Invalid ID parameter provided for vendor",
+        });
+        return;
+      }
+      const isStarred = Boolean(req.body?.isStarred);
+      const data = await vendorService.setStarred(id, isStarred);
+      res.status(200).json({
+        success: true,
+        message: isStarred ? "Vendor starred" : "Vendor unstarred",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const stats = await vendorService.getVendorStats();

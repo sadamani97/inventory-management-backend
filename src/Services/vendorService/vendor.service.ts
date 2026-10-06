@@ -54,6 +54,15 @@ class vendorService {
         await vendor.update(data)
         return vendor
     }
+    async setStarred(id: number, isStarred: boolean) {
+        const vendor = await Vendor.findByPk(id);
+        if (!vendor) {
+            throw new Error("Vendor not found");
+        }
+        await vendor.update({ isStarred });
+        return vendor;
+    }
+
     async Delete(id: number) {
         const vendor = await Vendor.findByPk(id)
         if (!vendor) {
