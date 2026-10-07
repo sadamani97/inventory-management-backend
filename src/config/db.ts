@@ -57,12 +57,16 @@ async function ensureDatabaseExists(url: string) {
     const parsedUrl = new URL(url);
     const dbName = parsedUrl.pathname.replace(/^\//, "");
     
-    const config = {
+    const config: any = {
       host: parsedUrl.hostname,
       port: Number(parsedUrl.port) || 3306,
       user: parsedUrl.username,
       password: parsedUrl.password,
     };
+    
+    if (parsedUrl.searchParams.has("ssl")) {
+      config.ssl = { rejectUnauthorized: true };
+    }
 
     const connection = await mysql.createConnection(config);
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
@@ -87,9 +91,15 @@ if (currentBranch === "main") {
   dbUrl = env.DATABASE_URL_DEV;
 }
 
+const dialectOptions: any = {};
+if (dbUrl.includes("ssl=")) {
+  dialectOptions.ssl = { rejectUnauthorized: true };
+}
+
 export const sequelize = new Sequelize(dbUrl, {
   dialect: "mysql",
   logging: false,
+  dialectOptions,
 });
 
 export const initDb = async () => {

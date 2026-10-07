@@ -1,9 +1,14 @@
+# Dependencies
 node_modules/
 
+# Build output
 dist/
-# Keep environment variables out of version control
+
+# Environment variables and config
 .env
+src/config/env.ts
 
-
+# Postman collections/environments
 .postman
-
+postman/
+postman

@@ -8,4 +8,7 @@ export const env = {
     DATABASE_URL_MAIN: process.env.DATABASE_URL_MAIN || "mysql://root:root@localhost:3306/inventory_management_main",
     DATABASE_URL_STAGING: process.env.DATABASE_URL_STAGING || "mysql://root:root@localhost:3306/inventory_management_staging",
     DATABASE_URL_DEV: process.env.DATABASE_URL_DEV || "mysql://root:root@localhost:3306/inventory_management",
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "",
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "",
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "",
 }
