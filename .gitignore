@@ -12,3 +12,5 @@ src/config/env.ts
 .postman
 postman/
 postman
+
+inventory-management.postman_collection.json
