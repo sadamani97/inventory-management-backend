@@ -64,8 +64,8 @@ async function ensureDatabaseExists(url: string) {
       password: parsedUrl.password,
     };
     
-    if (parsedUrl.searchParams.has("ssl")) {
-      config.ssl = { rejectUnauthorized: true };
+    if (parsedUrl.searchParams.has("ssl") || url.includes("tidbcloud")) {
+      config.ssl = { minVersion: "TLSv1.2", rejectUnauthorized: true };
     }
 
     const connection = await mysql.createConnection(config);
@@ -91,12 +91,22 @@ if (currentBranch === "main") {
   dbUrl = env.DATABASE_URL_DEV;
 }
 
-const dialectOptions: any = {};
-if (dbUrl.includes("ssl=")) {
-  dialectOptions.ssl = { rejectUnauthorized: true };
+// Clean the dbUrl to remove query params like ssl that confuse Sequelize
+let cleanDbUrl = dbUrl;
+try {
+  const parsed = new URL(dbUrl);
+  parsed.searchParams.delete("ssl");
+  cleanDbUrl = parsed.toString();
+} catch (e) {
+  // Ignore
 }
 
-export const sequelize = new Sequelize(dbUrl, {
+const dialectOptions: any = {};
+if (dbUrl.includes("ssl=") || dbUrl.includes("tidbcloud")) {
+  dialectOptions.ssl = { minVersion: "TLSv1.2", rejectUnauthorized: true };
+}
+
+export const sequelize = new Sequelize(cleanDbUrl, {
   dialect: "mysql",
   logging: false,
   dialectOptions,
@@ -115,8 +125,9 @@ export const initDb = async () => {
     await sequelize.authenticate();
     console.log("[Database] Connection established successfully.");
 
-    await sequelize.sync({ alter: true });
-    console.log("[Database] Models synchronized successfully with schema alter.");
+    const isTiDB = dbUrl.includes("tidbcloud");
+    await sequelize.sync({ alter: !isTiDB });
+    console.log(`[Database] Models synchronized successfully (alter: ${!isTiDB}).`);
   } catch (error) {
     console.error("[Database] Failed to initialize database:", error);
     throw error;
