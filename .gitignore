@@ -7,10 +7,12 @@ dist/
 # Environment variables and config
 .env
 src/config/env.ts
-
 # Postman collections/environments
-.postman
+
+.postman/
+
 postman/
-postman
 
 inventory-management.postman_collection.json
+
+config/config.json
