@@ -37,6 +37,49 @@ class PurchaseOrderService extends BaseService<any> {
         return po;
     }
 
+    // Overriding Update to handle status changes and stock increment
+    async Update(id: number, data: any) {
+        const po: any = await PurchaseOrder.findByPk(id, {
+            include: [{ model: PurchaseOrderItem, as: "items" }]
+        });
+        if (!po) {
+            const error: any = new Error("Purchase Order not found");
+            error.status = 404;
+            throw error;
+        }
+
+        const oldStatus = po.status;
+        const newStatus = data.status || oldStatus;
+
+        const updatedPo = await po.update(data);
+
+        // If status changed to Completed/Delivered, update stock
+        if (
+            !["Completed", "Delivered", "Received"].includes(oldStatus) &&
+            ["Completed", "Delivered", "Received"].includes(newStatus)
+        ) {
+            const items = po.items || [];
+            for (const item of items) {
+                if (item.productId && item.quantity) {
+                    const product = await Product.findByPk(item.productId);
+                    if (product) {
+                        product.quantity = Number(product.quantity || 0) + Number(item.quantity);
+                        await product.save();
+                    }
+                }
+            }
+        }
+
+        // Log Activity
+        await PurchaseOrderActivity.create({
+            purchaseOrderId: po.id,
+            activityType: "PO Edited",
+            description: `Purchase order ${po.poNumber} updated. Status: ${newStatus}`,
+        });
+
+        return updatedPo;
+    }
+
     // Overriding findAll to perform joins with Vendor, Address, and PurchaseOrderItems
     async findAll(options = {}) {
         return await PurchaseOrder.findAll({
