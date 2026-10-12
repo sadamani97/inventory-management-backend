@@ -38,19 +38,6 @@ function getCurrentBranch(): string {
   }
 }
 
-// Mask database passwords in logs for security
-function maskDbUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    if (parsed.password) {
-      parsed.password = "****";
-    }
-    return parsed.toString();
-  } catch {
-    return url.replace(/:([^:@]+)@/, ":****@");
-  }
-}
-
 // Automatically create database if it does not exist
 async function ensureDatabaseExists(url: string) {
   try {
@@ -72,64 +59,71 @@ async function ensureDatabaseExists(url: string) {
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
     await connection.end();
   } catch (error) {
-    console.warn("[Database] Note: Could not pre-create database automatically. Sequelize will try to connect directly.", error);
+    // Ignore error and let Sequelize connect directly
   }
 }
 
 const currentBranch = getCurrentBranch();
 
-// Determine database URL based on the current branch
-let dbUrl = env.DATABASE_URL_DEV; // Default to local development database
+// Determine database URL based on environment or active git branch
+let dbUrl = "";
 
-if (currentBranch === "main") {
-  dbUrl = env.DATABASE_URL_MAIN;
+if (process.env.DATABASE_URL) {
+  dbUrl = process.env.DATABASE_URL;
+} else if (currentBranch === "main") {
+  dbUrl = env.DATABASE_URL_MAIN || env.DATABASE_URL || env.DATABASE_URL_DEV;
 } else if (currentBranch === "staging" || currentBranch === "stagging") {
-  dbUrl = env.DATABASE_URL_STAGING;
+  dbUrl = env.DATABASE_URL_STAGING || env.DATABASE_URL || env.DATABASE_URL_DEV;
 } else {
-  // Any other active issue/feature branch (e.g., SO-001, PO-01, BE-purchaseorder, developing)
-  // connects to the local development database
-  dbUrl = env.DATABASE_URL_DEV;
+  dbUrl = env.DATABASE_URL_DEV || env.DATABASE_URL || env.DATABASE_URL_MAIN;
+}
+
+// Fallback to any configured URL if the branch-specific one is not provided
+if (!dbUrl) {
+  dbUrl = env.DATABASE_URL || env.DATABASE_URL_MAIN || env.DATABASE_URL_STAGING || env.DATABASE_URL_DEV || "";
 }
 
 // Clean the dbUrl to remove query params like ssl that confuse Sequelize
 let cleanDbUrl = dbUrl;
-try {
-  const parsed = new URL(dbUrl);
-  parsed.searchParams.delete("ssl");
-  cleanDbUrl = parsed.toString();
-} catch (e) {
-  // Ignore
+if (dbUrl) {
+  try {
+    const parsed = new URL(dbUrl);
+    parsed.searchParams.delete("ssl");
+    cleanDbUrl = parsed.toString();
+  } catch (e) {
+    // Ignore
+  }
 }
 
 const dialectOptions: any = {};
-if (dbUrl.includes("ssl=") || dbUrl.includes("tidbcloud")) {
+if (dbUrl && (dbUrl.includes("ssl=") || dbUrl.includes("tidbcloud"))) {
   dialectOptions.ssl = { minVersion: "TLSv1.2", rejectUnauthorized: true };
 }
 
-export const sequelize = new Sequelize(cleanDbUrl, {
-  dialect: "mysql",
-  logging: false,
-  dialectOptions,
-});
+export const sequelize = dbUrl
+  ? new Sequelize(cleanDbUrl, {
+      dialect: "mysql",
+      logging: false,
+      dialectOptions,
+    })
+  : new Sequelize({
+      dialect: "mysql",
+      logging: false,
+    });
 
 export const initDb = async () => {
-  try {
-    console.log(`[Database] Detected Git Branch: "${currentBranch}"`);
-    console.log(`[Database] Connecting to: ${maskDbUrl(dbUrl)}`);
-    
-    // Ensure all three configured databases exist in MySQL
-    await ensureDatabaseExists(env.DATABASE_URL_DEV);
-    await ensureDatabaseExists(env.DATABASE_URL_STAGING);
-    await ensureDatabaseExists(env.DATABASE_URL_MAIN);
-
-    await sequelize.authenticate();
-    console.log("[Database] Connection established successfully.");
-
-    const isTiDB = dbUrl.includes("tidbcloud");
-    await sequelize.sync({ alter: !isTiDB });
-    console.log(`[Database] Models synchronized successfully (alter: ${!isTiDB}).`);
-  } catch (error) {
-    console.error("[Database] Failed to initialize database:", error);
-    throw error;
+  if (!dbUrl) {
+    throw new Error("Missing DATABASE_URL in environment variables.");
   }
+
+  // Ensure configured databases exist if URLs are present
+  if (env.DATABASE_URL_DEV) await ensureDatabaseExists(env.DATABASE_URL_DEV);
+  if (env.DATABASE_URL_STAGING) await ensureDatabaseExists(env.DATABASE_URL_STAGING);
+  if (env.DATABASE_URL_MAIN) await ensureDatabaseExists(env.DATABASE_URL_MAIN);
+
+  await sequelize.authenticate();
+
+  const isTiDB = dbUrl.includes("tidbcloud");
+  await sequelize.sync({ alter: !isTiDB });
 };
+
