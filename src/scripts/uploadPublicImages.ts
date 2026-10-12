@@ -1,12 +1,6 @@
-import { v2 as cloudinary } from "cloudinary";
+import { cloudinary } from "../config/cloudinary.config.js";
 import fs from "fs";
 import path from "path";
-
-cloudinary.config({
-  cloud_name: "t9mp1o4f",
-  api_key: "925925665314418",
-  api_secret: "49Xg2sDKOVSLHBhKfljMVx1YUsY",
-});
 
 const publicDir = "C:\\Users\\sadamani\\OneDrive\\Desktop\\INVT_MANG\\inventory-frontend-split\\public";
 
