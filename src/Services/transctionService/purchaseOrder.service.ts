@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { BaseService } from "../baseService.js";
 import {
     PurchaseOrder,
@@ -81,8 +82,23 @@ class PurchaseOrderService extends BaseService<any> {
     }
 
     // Overriding findAll to perform joins with Vendor, Address, and PurchaseOrderItems
-    async findAll(options = {}) {
-        return await PurchaseOrder.findAll({
+    async findAll(options: any = {}) {
+        const { page, limit, search, status, ...otherOptions } = options;
+
+        const where: any = { ...(otherOptions.where || {}) };
+        if (status && status !== "All Status" && status !== "All") {
+            where.status = status;
+        }
+        if (search && typeof search === "string" && search.trim()) {
+            const term = `%${search.trim()}%`;
+            where[Op.or] = [
+                { poNumber: { [Op.like]: term } },
+                { vendorName: { [Op.like]: term } },
+                { notes: { [Op.like]: term } },
+            ];
+        }
+
+        const queryOptions: any = {
             include: [
                 {
                     model: Vendor,
@@ -99,9 +115,23 @@ class PurchaseOrderService extends BaseService<any> {
                     attributes: ["id", "productId", "quantity", "unitPrice", "totalPrice"],
                 },
             ],
+            where,
             order: [["createdAt", "DESC"]],
-            ...options,
-        });
+            ...otherOptions,
+        };
+
+        if (page !== undefined && limit !== undefined && !isNaN(page) && !isNaN(limit)) {
+            const pageNum = Math.max(1, parseInt(page, 10));
+            const limitNum = Math.max(1, parseInt(limit, 10));
+            queryOptions.limit = limitNum;
+            queryOptions.offset = (pageNum - 1) * limitNum;
+            queryOptions.distinct = true;
+
+            const { count, rows } = await PurchaseOrder.findAndCountAll(queryOptions);
+            return { count, rows };
+        }
+
+        return await PurchaseOrder.findAll(queryOptions);
     }
 
     // Overriding FindById to perform deep joins with Vendor, VendorContact, Address, PurchaseOrderItem -> Product, Activities

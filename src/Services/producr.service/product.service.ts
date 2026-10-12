@@ -65,21 +65,54 @@ class ProductService {
     }
 
 
-    async findAll() {
-        return await Product.findAll({
+    async findAll(options: any = {}) {
+        const { page, limit, search, categoryName, ...otherOptions } = options;
+
+        const where: any = { ...(otherOptions.where || {}) };
+        if (search && typeof search === "string" && search.trim()) {
+            const term = `%${search.trim()}%`;
+            where[Op.or] = [
+                { productName: { [Op.like]: term } },
+                { sku: { [Op.like]: term } }
+            ];
+        }
+
+        const categoryInclude: any = {
+            model: Category,
+            as: "category",
+            attributes: ["categoryId", "categoryName"],
+        };
+
+        if (categoryName && categoryName !== "All Category" && categoryName !== "All") {
+            categoryInclude.where = { categoryName };
+        }
+
+        const queryOptions: any = {
             include: [
-                {
-                    model: Category,
-                    as: "category",
-                    attributes: ["categoryId", "categoryName"],
-                },
+                categoryInclude,
                 {
                     model: Vendor,
                     as: "vendor",
                     attributes: ["vendorId", "vendorName"],
                 },
             ],
-        })
+            where,
+            order: [["id", "DESC"]],
+            ...otherOptions,
+        };
+
+        if (page !== undefined && limit !== undefined && !isNaN(page) && !isNaN(limit)) {
+            const pageNum = Math.max(1, parseInt(page, 10));
+            const limitNum = Math.max(1, parseInt(limit, 10));
+            queryOptions.limit = limitNum;
+            queryOptions.offset = (pageNum - 1) * limitNum;
+            queryOptions.distinct = true;
+
+            const { count, rows } = await Product.findAndCountAll(queryOptions);
+            return { count, rows };
+        }
+
+        return await Product.findAll(queryOptions);
     }
     async FindById(id: number) {
         console.log("seacrching product id")
