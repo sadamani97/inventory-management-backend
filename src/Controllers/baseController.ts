@@ -23,14 +23,16 @@ export class BaseController<T> {
             });
 
             if (result && typeof result === "object" && "rows" in result && "count" in result) {
+                const pageNum = page ? Math.max(1, page) : 1;
+                const limitNum = limit ? Math.max(1, limit) : (result.rows.length || 10);
                 res.status(200).json({
                     success: true,
                     message: `${this.entrieName}s`,
                     data: result.rows,
                     totalItems: result.count,
-                    page: page || 1,
-                    limit: limit || result.rows.length,
-                    totalPages: limit ? Math.ceil(result.count / limit) : 1,
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: limitNum > 0 ? Math.ceil(result.count / limitNum) : 1,
                 });
                 return;
             }

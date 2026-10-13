@@ -62,8 +62,22 @@ class InvoiceService extends BaseService<any> {
     return invoice;
   }
 
-  async findAll(options = {}) {
-    return await Invoice.findAll({
+  async findAll(options: any = {}) {
+    const { page, limit, search, status, ...otherOptions } = options;
+
+    const where: any = { ...(otherOptions.where || {}) };
+    if (status && status !== "All Status" && status !== "All") {
+      where.status = status;
+    }
+    if (search && typeof search === "string" && search.trim()) {
+      const term = `%${search.trim()}%`;
+      where[Op.or] = [
+        { invoiceNumber: { [Op.like]: term } },
+        { customerName: { [Op.like]: term } },
+      ];
+    }
+
+    const queryOptions: any = {
       include: [
         {
           model: InvoiceItem,
@@ -87,9 +101,23 @@ class InvoiceService extends BaseService<any> {
           attributes: ["id", "orderNumber", "status"],
         },
       ],
+      where,
       order: [["createdAt", "DESC"]],
-      ...options,
-    });
+      ...otherOptions,
+    };
+
+    if (page !== undefined || limit !== undefined) {
+      const pageNum = Math.max(1, parseInt(page || 1, 10));
+      const limitNum = Math.max(1, parseInt(limit || 10, 10));
+      queryOptions.limit = limitNum;
+      queryOptions.offset = (pageNum - 1) * limitNum;
+      queryOptions.distinct = true;
+
+      const { count, rows } = await Invoice.findAndCountAll(queryOptions);
+      return { count, rows };
+    }
+
+    return await Invoice.findAll(queryOptions);
   }
 
   async FindById(id: number) {

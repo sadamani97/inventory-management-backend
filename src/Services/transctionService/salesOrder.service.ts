@@ -115,9 +115,9 @@ class SalesOrderService extends BaseService<any> {
       ...otherOptions,
     };
 
-    if (page !== undefined && limit !== undefined && !isNaN(page) && !isNaN(limit)) {
-      const pageNum = Math.max(1, parseInt(page, 10));
-      const limitNum = Math.max(1, parseInt(limit, 10));
+    if (page !== undefined || limit !== undefined) {
+      const pageNum = Math.max(1, parseInt(page || 1, 10));
+      const limitNum = Math.max(1, parseInt(limit || 10, 10));
       queryOptions.limit = limitNum;
       queryOptions.offset = (pageNum - 1) * limitNum;
       queryOptions.distinct = true;

@@ -7,5 +7,6 @@ reportRouter.get("/kpi-summary", reportController.getKpiSummary);
 reportRouter.get("/sales-analytics", reportController.getSalesAnalytics);
 reportRouter.get("/sales-vs-purchases", reportController.getSalesVsPurchases);
 reportRouter.get("/product-performance", reportController.getProductPerformance);
+reportRouter.get("/recent-activities", reportController.getRecentActivities);
 
 export default reportRouter;
