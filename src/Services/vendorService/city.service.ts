@@ -8,8 +8,12 @@ class CityService {
         if (exists) throw new Error("City already exists");
         return await City.create(data);
     }
-    async findAll() {
-        return await City.findAll({ include: [{ model: State, as: "state" }] });
+    async findAll(options: any = {}) {
+        const where: any = {};
+        if (options.stateId) {
+            where.stateId = Number(options.stateId);
+        }
+        return await City.findAll({ where, include: [{ model: State, as: "state" }] });
     }
     async FindById(id: number) {
         const city = await City.findByPk(id, { include: [{ model: State, as: "state" }] });
