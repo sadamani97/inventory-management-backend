@@ -6,29 +6,42 @@ export class AlertService {
         return await Alert.create(data as AlertAttributes);
     }
 
-    async findAll(query?: { severity?: string; status?: string; search?: string }) {
+    async findAll(query?: { severity?: string; status?: string; search?: string; page?: any; limit?: any }) {
         const whereClause: any = {};
 
-        if (query?.severity) {
+        if (query?.severity && query?.severity !== "All") {
             whereClause.severity = query?.severity;
         }
 
-        if (query?.status) {
+        if (query?.status && query?.status !== "All") {
             whereClause.status = query?.status;
         }
 
-        if (query?.search) {
+        if (query?.search && typeof query.search === "string" && query.search.trim()) {
             whereClause[Op.or] = [
-                { title: { [Op.like]: `%${query?.search}%` } },
-                { relatedItem: { [Op.like]: `%${query?.search}%` } },
-                { referenceId: { [Op.like]: `%${query?.search}%` } }
+                { title: { [Op.like]: `%${query?.search.trim()}%` } },
+                { relatedItem: { [Op.like]: `%${query?.search.trim()}%` } },
+                { referenceId: { [Op.like]: `%${query?.search.trim()}%` } }
             ];
         }
 
-        return await Alert.findAll({
+        const queryOptions: any = {
             where: whereClause,
-            order: [["createdAt", "DESC"]]
-        });
+            order: [["createdAt", "DESC"]],
+        };
+
+        if (query?.page !== undefined || query?.limit !== undefined) {
+            const pageNum = Math.max(1, parseInt(query?.page || 1, 10));
+            const limitNum = Math.max(1, parseInt(query?.limit || 10, 10));
+            queryOptions.limit = limitNum;
+            queryOptions.offset = (pageNum - 1) * limitNum;
+            queryOptions.distinct = true;
+
+            const { count, rows } = await Alert.findAndCountAll(queryOptions);
+            return { count, rows };
+        }
+
+        return await Alert.findAll(queryOptions);
     }
 
     async FindById(id: number) {

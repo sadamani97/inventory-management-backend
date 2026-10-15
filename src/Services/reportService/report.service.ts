@@ -166,6 +166,135 @@ export class ReportService {
 
         return performanceData;
     }
+
+    async getRecentActivities(query?: { page?: number; limit?: number; search?: string; status?: string }) {
+        const pageNum = Math.max(1, Number(query?.page || 1));
+        const limitNum = Math.max(1, Number(query?.limit || 10));
+
+        const pos = await PurchaseOrder.findAll({
+            order: [["createdAt", "DESC"]],
+            limit: 100,
+        });
+
+        const sos = await SalesOrder.findAll({
+            order: [["createdAt", "DESC"]],
+            limit: 100,
+        });
+
+        const prods = await Product.findAll({
+            order: [["updatedAt", "DESC"]],
+            limit: 100,
+        });
+
+        const allActivities: any[] = [];
+
+        pos.forEach((po: any, idx: number) => {
+            const isDelivered = ["completed", "delivered", "received"].includes((po.status || "").toLowerCase());
+            const d = po.createdAt || po.orderDate || new Date();
+            const timeDate = new Date(d);
+
+            allActivities.push({
+                id: `po-${po.id ?? idx}`,
+                activity: isDelivered ? "Vendor Delivery" : "Purchase Order Created",
+                product: po.vendorName || "Vendor Order",
+                sku: po.poNumber || `PO-${idx + 1}`,
+                qty: `+1`,
+                status: isDelivered ? "Delivered" : "Added",
+                time: timeDate.toISOString(),
+                createdAt: timeDate,
+            });
+        });
+
+        sos.forEach((so: any, idx: number) => {
+            const isDraft = (so.status || "").toLowerCase() === "draft";
+            if (!isDraft) {
+                const d = so.createdAt || so.orderDate || new Date();
+                const timeDate = new Date(d);
+
+                allActivities.push({
+                    id: `so-${so.id ?? idx}`,
+                    activity: "Stock Out",
+                    product: so.customerName || "Customer Order",
+                    sku: so.orderNumber || `SO-${idx + 1}`,
+                    qty: `-1`,
+                    status: "Completed",
+                    time: timeDate.toISOString(),
+                    createdAt: timeDate,
+                });
+            }
+        });
+
+        prods.forEach((prod: any, idx: number) => {
+            const qty = Number(prod.quantity || 0);
+            const limit = Number(prod.lowStockLimit || 10);
+            const updateDate = new Date(prod.updatedAt || prod.createdAt || new Date());
+            const createDate = new Date(prod.createdAt || new Date());
+
+            if (qty <= 0) {
+                allActivities.push({
+                    id: `prod-out-${prod.id ?? idx}`,
+                    activity: "Out of Stock Alert",
+                    product: prod.productName || "Product",
+                    sku: prod.sku || `SKU-${idx + 1}`,
+                    qty: "0 Left",
+                    status: "Warning",
+                    time: updateDate.toISOString(),
+                    createdAt: updateDate,
+                });
+            } else if (qty <= limit) {
+                allActivities.push({
+                    id: `prod-low-${prod.id ?? idx}`,
+                    activity: "Low Stock Alert",
+                    product: prod.productName || "Product",
+                    sku: prod.sku || `SKU-${idx + 1}`,
+                    qty: `${qty} Left`,
+                    status: "Warning",
+                    time: updateDate.toISOString(),
+                    createdAt: updateDate,
+                });
+            }
+
+            allActivities.push({
+                id: `prod-add-${prod.id ?? idx}`,
+                activity: "Product In Stock",
+                product: prod.productName || "Product",
+                sku: prod.sku || `SKU-${idx + 1}`,
+                qty: `+${qty}`,
+                status: "Added",
+                time: createDate.toISOString(),
+                createdAt: createDate,
+            });
+        });
+
+        allActivities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+        let filtered = allActivities;
+        if (query?.status && query.status !== "All Status" && query.status !== "All") {
+            const s = query.status.toLowerCase();
+            filtered = filtered.filter(a => (a.status || "").toLowerCase() === s);
+        }
+
+        if (query?.search && query.search.trim()) {
+            const term = query.search.trim().toLowerCase();
+            filtered = filtered.filter(a =>
+                (a.activity || "").toLowerCase().includes(term) ||
+                (a.product || "").toLowerCase().includes(term) ||
+                (a.sku || "").toLowerCase().includes(term)
+            );
+        }
+
+        const totalCount = filtered.length;
+        const offset = (pageNum - 1) * limitNum;
+        const rows = filtered.slice(offset, offset + limitNum);
+
+        return {
+            count: totalCount,
+            rows,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: limitNum > 0 ? Math.ceil(totalCount / limitNum) : 1,
+        };
+    }
 }
 
 export const reportService = new ReportService();

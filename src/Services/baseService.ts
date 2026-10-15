@@ -27,7 +27,23 @@ export class BaseService<T extends { [key: string]: any }> {
     return await this.model.create(data);
   }
 
-  async findAll(options = {}) {
+  async findAll(options: any = {}) {
+    const { page, limit, ...otherOptions } = options;
+    if (page !== undefined || limit !== undefined) {
+      const pageNum = Math.max(1, parseInt(page || 1, 10));
+      const limitNum = Math.max(1, parseInt(limit || 10, 10));
+      const offset = (pageNum - 1) * limitNum;
+
+      const { count, rows } = await this.model.findAndCountAll({
+        ...otherOptions,
+        limit: limitNum,
+        offset,
+        distinct: true,
+      });
+
+      return { count, rows };
+    }
+
     return await this.model.findAll(options);
   }
 

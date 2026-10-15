@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { BaseService } from "../baseService.js";
 import { SalesOrder, SalesOrderItem } from "../../models/salesOrder/index.js";
 import { Product } from "../../models/product/product.model.js";
@@ -74,8 +75,23 @@ class SalesOrderService extends BaseService<any> {
     return salesOrder;
   }
 
-  async findAll(options = {}) {
-    return await SalesOrder.findAll({
+  async findAll(options: any = {}) {
+    const { page, limit, search, status, ...otherOptions } = options;
+
+    const where: any = { ...(otherOptions.where || {}) };
+    if (status && status !== "All Status" && status !== "All") {
+      where.status = status;
+    }
+    if (search && typeof search === "string" && search.trim()) {
+      const term = `%${search.trim()}%`;
+      where[Op.or] = [
+        { orderNumber: { [Op.like]: term } },
+        { customerName: { [Op.like]: term } },
+        { notes: { [Op.like]: term } },
+      ];
+    }
+
+    const queryOptions: any = {
       include: [
         {
           model: SalesOrderItem,
@@ -94,9 +110,23 @@ class SalesOrderService extends BaseService<any> {
           attributes: ["id", "email"],
         },
       ],
+      where,
       order: [["createdAt", "DESC"]],
-      ...options,
-    });
+      ...otherOptions,
+    };
+
+    if (page !== undefined || limit !== undefined) {
+      const pageNum = Math.max(1, parseInt(page || 1, 10));
+      const limitNum = Math.max(1, parseInt(limit || 10, 10));
+      queryOptions.limit = limitNum;
+      queryOptions.offset = (pageNum - 1) * limitNum;
+      queryOptions.distinct = true;
+
+      const { count, rows } = await SalesOrder.findAndCountAll(queryOptions);
+      return { count, rows };
+    }
+
+    return await SalesOrder.findAll(queryOptions);
   }
 
   async FindById(id: number) {

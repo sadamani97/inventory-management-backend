@@ -1,9 +1,18 @@
+# Dependencies
 node_modules/
 
+# Build output
 dist/
-# Keep environment variables out of version control
+
+# Environment variables and config
 .env
 
+# Postman collections/environments
 
-.postman
+.postman/
 
+postman/
+
+inventory-management.postman_collection.json
+
+config/config.json

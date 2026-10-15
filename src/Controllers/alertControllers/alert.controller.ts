@@ -35,16 +35,38 @@ export class AlertController extends BaseController<any> {
 
     findAllFiltered = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const { severity, status, search } = req.query;
-            const alerts = await alertService.findAll({
+            const { severity, status, search, page, limit } = req.query;
+            const pageNum = page ? parseInt(page as string, 10) : undefined;
+            const limitNum = limit ? parseInt(limit as string, 10) : undefined;
+
+            const result = await alertService.findAll({
                 severity: severity as string,
                 status: status as string,
-                search: search as string
+                search: search as string,
+                page: pageNum,
+                limit: limitNum,
             });
+
+            if (result && typeof result === "object" && "rows" in result && "count" in result) {
+                const p = pageNum || 1;
+                const l = limitNum || (result.rows.length || 10);
+                res.status(200).json({
+                    success: true,
+                    message: "Alerts fetched successfully",
+                    data: result.rows,
+                    totalItems: result.count,
+                    page: p,
+                    limit: l,
+                    totalPages: l > 0 ? Math.ceil(result.count / l) : 1,
+                });
+                return;
+            }
+
             res.status(200).json({
                 success: true,
                 message: "Alerts fetched successfully",
-                data: alerts
+                data: result,
+                totalItems: Array.isArray(result) ? result.length : 0,
             });
         } catch (error) {
             next(error);

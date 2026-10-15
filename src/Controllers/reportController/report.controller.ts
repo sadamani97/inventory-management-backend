@@ -57,6 +57,29 @@ export class ReportController {
             next(error);
         }
     };
+
+    getRecentActivities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { page, limit, search, status } = req.query;
+            const result = await reportService.getRecentActivities({
+                page: page ? parseInt(page as string, 10) : 1,
+                limit: limit ? parseInt(limit as string, 10) : 10,
+                search: search as string,
+                status: status as string,
+            });
+            res.status(200).json({
+                success: true,
+                message: "Recent activities fetched successfully",
+                data: result.rows,
+                totalItems: result.count,
+                page: result.page,
+                limit: result.limit,
+                totalPages: result.totalPages,
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 export const reportController = new ReportController();

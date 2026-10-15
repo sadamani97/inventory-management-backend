@@ -8,8 +8,12 @@ class StateService {
         if (exists) throw new Error("State already exists");
         return await State.create(data);
     }
-    async findAll() {
-        return await State.findAll({ include: [{ model: Country, as: "country" }] });
+    async findAll(options: any = {}) {
+        const where: any = {};
+        if (options.countryId) {
+            where.countryId = Number(options.countryId);
+        }
+        return await State.findAll({ where, include: [{ model: Country, as: "country" }] });
     }
     async FindById(id: number) {
         const state = await State.findByPk(id, { include: [{ model: Country, as: "country" }] });
