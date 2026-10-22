@@ -56,10 +56,9 @@ export class ReportService {
         };
     }
 
-    async getSalesAnalytics() {
-        // Compute last 7 days sales dynamically
+    async getSalesAnalytics(daysCount: number = 7) {
+        const days = Math.max(1, Number(daysCount) || 7);
         const chartData = [];
-        const days = 7;
         const now = new Date();
 
         for (let i = days - 1; i >= 0; i--) {
