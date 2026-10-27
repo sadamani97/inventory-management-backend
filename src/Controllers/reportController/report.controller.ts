@@ -17,7 +17,18 @@ export class ReportController {
 
     getSalesAnalytics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const data = await reportService.getSalesAnalytics();
+            const { days, range } = req.query;
+            let daysNum = 7;
+            if (days) {
+                daysNum = parseInt(days as string, 10);
+            } else if (range === "Per Day" || range === "1 Day" || range === "day" || range === "1") {
+                daysNum = 1;
+            } else if (range === "10 Days" || range === "10") {
+                daysNum = 10;
+            } else if (range === "Weekly" || range === "7") {
+                daysNum = 7;
+            }
+            const data = await reportService.getSalesAnalytics(daysNum);
             res.status(200).json({
                 success: true,
                 message: "Sales analytics fetched successfully",
