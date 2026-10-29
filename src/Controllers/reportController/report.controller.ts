@@ -91,6 +91,19 @@ export class ReportController {
             next(error);
         }
     };
+
+    getCategoryQuantities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const data = await reportService.getCategoryQuantities();
+            res.status(200).json({
+                success: true,
+                message: "Category quantities fetched successfully",
+                data,
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 export const reportController = new ReportController();

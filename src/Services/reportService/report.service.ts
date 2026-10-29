@@ -294,6 +294,31 @@ export class ReportService {
             totalPages: limitNum > 0 ? Math.ceil(totalCount / limitNum) : 1,
         };
     }
+    async getCategoryQuantities() {
+        const { Category } = await import("../../models/product/index.js");
+        const products = await Product.findAll({
+            include: [
+                {
+                    model: Category,
+                    as: "category",
+                    attributes: ["categoryId", "categoryName"],
+                },
+            ],
+        });
+
+        const categoryMap = {};
+        products.forEach((prod) => {
+            const catName = prod?.category?.categoryName || "General";
+            const qty = Number(prod?.quantity || 0);
+            categoryMap[catName] = (categoryMap[catName] || 0) + qty;
+        });
+
+        const result = Object.entries(categoryMap)
+            .map(([name, count]) => ({ name, count, quantity: count }))
+            .sort((a, b) => b.count - a.count);
+
+        return result;
+    }
 }
 
 export const reportService = new ReportService();
