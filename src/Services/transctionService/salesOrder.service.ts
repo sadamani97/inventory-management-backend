@@ -87,7 +87,6 @@ class SalesOrderService extends BaseService<any> {
       where[Op.or] = [
         { orderNumber: { [Op.like]: term } },
         { customerName: { [Op.like]: term } },
-        { notes: { [Op.like]: term } },
       ];
     }
 
