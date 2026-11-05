@@ -2,6 +2,7 @@ import { Product } from "../../models/product/product.model.js";
 import { SalesOrder } from "../../models/salesOrder/salesOrder.model.js";
 import { SalesOrderItem } from "../../models/salesOrder/salesOrderItem.model.js";
 import { PurchaseOrder } from "../../models/transctionModel/purchaseOrder.model.js";
+import { PurchaseOrderItem } from "../../models/transctionModel/purchaseOrderItem.model.js";
 import { sequelize } from "../../config/db.js";
 import { Op } from "sequelize";
 
@@ -166,16 +167,40 @@ export class ReportService {
         return performanceData;
     }
 
-    async getRecentActivities(query?: { page?: number; limit?: number; search?: string; status?: string }) {
+    async getRecentActivities(query?: { page?: number; limit?: number; search?: string; status?: string; date?: string }) {
         const pageNum = Math.max(1, Number(query?.page || 1));
         const limitNum = Math.max(1, Number(query?.limit || 10));
 
         const pos = await PurchaseOrder.findAll({
+            include: [
+                {
+                    model: PurchaseOrderItem,
+                    as: "items",
+                    include: [
+                        {
+                            model: Product,
+                            as: "product",
+                        },
+                    ],
+                },
+            ],
             order: [["createdAt", "DESC"]],
             limit: 100,
         });
 
         const sos = await SalesOrder.findAll({
+            include: [
+                {
+                    model: SalesOrderItem,
+                    as: "items",
+                    include: [
+                        {
+                            model: Product,
+                            as: "product",
+                        },
+                    ],
+                },
+            ],
             order: [["createdAt", "DESC"]],
             limit: 100,
         });
@@ -192,16 +217,38 @@ export class ReportService {
             const d = po.createdAt || po.orderDate || new Date();
             const timeDate = new Date(d);
 
-            allActivities.push({
-                id: `po-${po.id ?? idx}`,
-                activity: isDelivered ? "Vendor Delivery" : "Purchase Order Created",
-                product: po.vendorName || "Vendor Order",
-                sku: po.poNumber || `PO-${idx + 1}`,
-                qty: `+1`,
-                status: isDelivered ? "Delivered" : "Added",
-                time: timeDate.toISOString(),
-                createdAt: timeDate,
-            });
+            if (Array.isArray(po.items) && po.items.length > 0) {
+                po.items.forEach((item: any, itemIdx: number) => {
+                    const prodName = item.product?.productName || "Product";
+                    const prodSku = item.product?.sku || `SKU-${item.productId || itemIdx + 1}`;
+                    const qtyVal = Number(item.receivedQuantity || item.quantity || 1);
+
+                    allActivities.push({
+                        id: `po-${po.id}-item-${item.id ?? itemIdx}`,
+                        activity: isDelivered ? "Stock In" : "Ordered Products",
+                        product: prodName,
+                        sku: prodSku,
+                        qty: `+${qtyVal}`,
+                        quantityValue: qtyVal,
+                        productId: item.productId,
+                        status: "Completed",
+                        time: timeDate.toISOString(),
+                        createdAt: timeDate,
+                    });
+                });
+            } else {
+                allActivities.push({
+                    id: `po-${po.id ?? idx}`,
+                    activity: isDelivered ? "Stock In" : "Ordered Products",
+                    product: po.vendorName || "Vendor Order",
+                    sku: po.poNumber || `PO-${idx + 1}`,
+                    qty: `+1`,
+                    quantityValue: 1,
+                    status: "Completed",
+                    time: timeDate.toISOString(),
+                    createdAt: timeDate,
+                });
+            }
         });
 
         sos.forEach((so: any, idx: number) => {
@@ -210,16 +257,38 @@ export class ReportService {
                 const d = so.createdAt || so.orderDate || new Date();
                 const timeDate = new Date(d);
 
-                allActivities.push({
-                    id: `so-${so.id ?? idx}`,
-                    activity: "Stock Out",
-                    product: so.customerName || "Customer Order",
-                    sku: so.orderNumber || `SO-${idx + 1}`,
-                    qty: `-1`,
-                    status: "Completed",
-                    time: timeDate.toISOString(),
-                    createdAt: timeDate,
-                });
+                if (Array.isArray(so.items) && so.items.length > 0) {
+                    so.items.forEach((item: any, itemIdx: number) => {
+                        const prodName = item.productName || item.product?.productName || "Product";
+                        const prodSku = item.product?.sku || `SKU-${item.productId || itemIdx + 1}`;
+                        const qtyVal = Number(item.quantity || 1);
+
+                        allActivities.push({
+                            id: `so-${so.id}-item-${item.id ?? itemIdx}`,
+                            activity: "Stock Out",
+                            product: prodName,
+                            sku: prodSku,
+                            qty: `-${qtyVal}`,
+                            quantityValue: qtyVal,
+                            productId: item.productId,
+                            status: "Completed",
+                            time: timeDate.toISOString(),
+                            createdAt: timeDate,
+                        });
+                    });
+                } else {
+                    allActivities.push({
+                        id: `so-${so.id ?? idx}`,
+                        activity: "Stock Out",
+                        product: so.customerName || "Customer Order",
+                        sku: so.orderNumber || `SO-${idx + 1}`,
+                        qty: `-1`,
+                        quantityValue: 1,
+                        status: "Completed",
+                        time: timeDate.toISOString(),
+                        createdAt: timeDate,
+                    });
+                }
             }
         });
 
@@ -232,10 +301,12 @@ export class ReportService {
             if (qty <= 0) {
                 allActivities.push({
                     id: `prod-out-${prod.id ?? idx}`,
-                    activity: "Out of Stock Alert",
+                    activity: "Out of Stock",
                     product: prod.productName || "Product",
                     sku: prod.sku || `SKU-${idx + 1}`,
-                    qty: "0 Left",
+                    qty: "0",
+                    quantityValue: 0,
+                    productId: prod.id,
                     status: "Warning",
                     time: updateDate.toISOString(),
                     createdAt: updateDate,
@@ -243,10 +314,12 @@ export class ReportService {
             } else if (qty <= limit) {
                 allActivities.push({
                     id: `prod-low-${prod.id ?? idx}`,
-                    activity: "Low Stock Alert",
+                    activity: "Low Stock",
                     product: prod.productName || "Product",
                     sku: prod.sku || `SKU-${idx + 1}`,
-                    qty: `${qty} Left`,
+                    qty: `${qty} left`,
+                    quantityValue: qty,
+                    productId: prod.id,
                     status: "Warning",
                     time: updateDate.toISOString(),
                     createdAt: updateDate,
@@ -255,10 +328,12 @@ export class ReportService {
 
             allActivities.push({
                 id: `prod-add-${prod.id ?? idx}`,
-                activity: "Product In Stock",
+                activity: "New Product Added",
                 product: prod.productName || "Product",
                 sku: prod.sku || `SKU-${idx + 1}`,
                 qty: `+${qty}`,
+                quantityValue: qty,
+                productId: prod.id,
                 status: "Added",
                 time: createDate.toISOString(),
                 createdAt: createDate,
@@ -268,6 +343,15 @@ export class ReportService {
         allActivities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
         let filtered = allActivities;
+
+        if (query?.date && query.date.trim()) {
+            const targetDateStr = query.date.trim().split("T")[0];
+            filtered = filtered.filter(a => {
+                const itemDateStr = a.createdAt.toISOString().split("T")[0];
+                return itemDateStr === targetDateStr;
+            });
+        }
+
         if (query?.status && query.status !== "All Status" && query.status !== "All") {
             const s = query.status.toLowerCase();
             filtered = filtered.filter(a => (a.status || "").toLowerCase() === s);
@@ -293,6 +377,95 @@ export class ReportService {
             limit: limitNum,
             totalPages: limitNum > 0 ? Math.ceil(totalCount / limitNum) : 1,
         };
+    }
+    async getCategoryQuantities(query?: { month?: string | number; year?: string | number; date?: string }) {
+        const { Category } = await import("../../models/product/index.js");
+        const { SalesOrder, SalesOrderItem } = await import("../../models/salesOrder/index.js");
+
+        let targetYear: number | undefined;
+        let targetMonth: number | undefined;
+
+        if (query?.date) {
+            const parsed = new Date(query.date);
+            if (!Number.isNaN(parsed.getTime())) {
+                targetYear = parsed.getFullYear();
+                targetMonth = parsed.getMonth();
+            }
+        } else if (query?.month !== undefined && query.month !== "") {
+            const m = Number(query.month);
+            if (!Number.isNaN(m)) {
+                targetMonth = m >= 1 && m <= 12 ? m - 1 : m;
+            }
+            if (query?.year !== undefined && query.year !== "") {
+                const y = Number(query.year);
+                if (!Number.isNaN(y)) {
+                    targetYear = y;
+                }
+            }
+        }
+
+        if (targetMonth === undefined) {
+            const now = new Date();
+            targetMonth = now.getMonth();
+            if (targetYear === undefined) {
+                targetYear = now.getFullYear();
+            }
+        } else if (targetYear === undefined) {
+            targetYear = new Date().getFullYear();
+        }
+
+        const startDate = new Date(targetYear, targetMonth, 1, 0, 0, 0, 0);
+        const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
+
+        const salesOrders = await SalesOrder.findAll({
+            where: {
+                createdAt: {
+                    [Op.between]: [startDate, endDate],
+                },
+            },
+            include: [
+                {
+                    model: SalesOrderItem,
+                    as: "items",
+                    include: [
+                        {
+                            model: Product,
+                            as: "product",
+                            include: [
+                                {
+                                    model: Category,
+                                    as: "category",
+                                    attributes: ["categoryId", "categoryName"],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const categorySalesMap: Record<string, number> = {};
+
+        salesOrders.forEach((so: any) => {
+            const items = so.items || [];
+            items.forEach((item: any) => {
+                const catName = item.product?.category?.categoryName || "General";
+                const qty = Number(item.quantity || 0);
+                categorySalesMap[catName] = (categorySalesMap[catName] || 0) + qty;
+            });
+        });
+
+        const result = Object.entries(categorySalesMap)
+            .map(([name, count]) => ({
+                name,
+                count,
+                quantity: count,
+                month: targetMonth,
+                year: targetYear,
+            }))
+            .sort((a, b) => b.count - a.count);
+
+        return result;
     }
 }
 

@@ -71,12 +71,13 @@ export class ReportController {
 
     getRecentActivities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const { page, limit, search, status } = req.query;
+            const { page, limit, search, status, date } = req.query;
             const result = await reportService.getRecentActivities({
                 page: page ? parseInt(page as string, 10) : 1,
                 limit: limit ? parseInt(limit as string, 10) : 10,
                 search: search as string,
                 status: status as string,
+                date: date as string,
             });
             res.status(200).json({
                 success: true,
@@ -86,6 +87,24 @@ export class ReportController {
                 page: result.page,
                 limit: result.limit,
                 totalPages: result.totalPages,
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    getCategoryQuantities = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { month, year, date } = req.query;
+            const data = await reportService.getCategoryQuantities({
+                month: month as string,
+                year: year as string,
+                date: date as string,
+            });
+            res.status(200).json({
+                success: true,
+                message: "Category quantities fetched successfully",
+                data,
             });
         } catch (error) {
             next(error);
